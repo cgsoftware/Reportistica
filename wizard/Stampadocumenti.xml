@@ -1,0 +1,51 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data>
+        <record id="view_stampa_brogliaccio" model="ir.ui.view">
+            <field name="name">Stampa Brogliaccio Documenti di vendita</field>
+            <field name="model">fiscaldoc.brogliacci</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                    <form string="Parametri di Stampa"  >
+                        <field name="dadata" colspan="4" />
+                        <field name="adata" colspan="4" />
+                        <field name="dacliente" colspan="4"/>
+                        <field name="acliente" colspan="4"/>
+                        <field name="tipodoc" colspan="4"/>
+                        <field name="atipodoc" colspan="4"/>
+                        <!--   <field name="ordine" width="300" colspan="4"/> -->
+                        <field name="group1"/>
+                        <field name="group2"/>
+                        <field name="stampa"/>	
+                        <separator colspan="4"/>
+                        <group col="4" colspan="4">
+                            <button icon="gtk-cancel" special="cancel" string="Cancel" colspan="2"/>
+                            <button icon="gtk-print" name="check_report" string="Stampa" type="object" colspan="2" default_focus="1" />
+                        </group>
+                    </form>
+                
+            </field>
+        </record>
+        
+
+            
+          <act_window name='action_stampa_brogliaccio'
+	    			res_model='fiscaldoc.brogliacci'
+	    			
+	    			view_mode='form'
+	    			target='new'
+	    			key2='client_action_multi'
+	      			id='view_stampa_brogliaccio' /> 
+	    
+	    <menuitem action="view_stampa_brogliaccio" 
+		  		  icon = 'STOCK_EXECUTE'
+		          name='Stampa brogliaccio documenti di vendita'
+	              id="menu_stampa_brocliaccio" 
+		          parent="base.menu_sales"  sequence="6"/>
+            
+            
+        
+        
+    </data>
+</openerp>
+

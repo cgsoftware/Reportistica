@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<openerp>
+<data >
+	<!-- REPORT ORDINATO PER TIPO DI DOCUMENTO -->
+	<record id="report_sintetica1" model="ir.actions.report.xml">
+        <field name="name">Fatture_sintetica1</field>
+        <field name="type">ir.actions.report.xml</field>
+        <field name="model">fiscaldoc.header</field>
+        <field name="report_name">sintetica1</field>
+        <field name="report_rml">Reportistica/report/sintetica1.jrxml</field>
+        <field name="report_type">pdf</field>
+        <field name="jasper_report">True</field>
+        <field name="jasper_output">pdf</field>
+	</record>
+	
+	<!-- REPORT ORDINANATO PER NUMERO DI DOCUMENTO -->
+	<record id="report_sintetica2" model="ir.actions.report.xml">
+        <field name="name">Fatture_sintetica2</field>
+        <field name="type">ir.actions.report.xml</field>
+        <field name="model">fiscaldoc.header</field>
+        <field name="report_name">sintetica2</field>
+        <field name="report_rml">Reportistica/report/sintetica2.jrxml</field>
+        <field name="report_type">pdf</field>
+        <field name="jasper_report">True</field>
+        <field name="jasper_output">pdf</field>
+	</record>
+	
+	<!-- REPORT DETTAGLIATO -->
+	<record id="report_dettaglio1" model="ir.actions.report.xml">
+        <field name="name">Fatture_dettaglio1</field>
+        <field name="type">ir.actions.report.xml</field>
+        <field name="model">fiscaldoc.header</field>
+        <field name="report_name">dettaglio1</field>
+        <field name="report_rml">Reportistica/report/dettalio1.jrxml</field>
+        <field name="report_type">pdf</field>
+        <field name="jasper_report">True</field>
+        <field name="jasper_output">pdf</field>
+	</record>
+	
+	
+ </data>
+</openerp>
