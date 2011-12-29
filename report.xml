@@ -37,6 +37,16 @@
         <field name="jasper_output">pdf</field>
 	</record>
 	
+	<record id="report_dettaglio2" model="ir.actions.report.xml">
+        <field name="name">Fatture_dettaglio2</field>
+        <field name="type">ir.actions.report.xml</field>
+        <field name="model">fiscaldoc.header</field>
+        <field name="report_name">dettaglio2</field>
+        <field name="report_rml">Reportistica/report/dettalio2.jrxml</field>
+        <field name="report_type">pdf</field>
+        <field name="jasper_report">True</field>
+        <field name="jasper_output">pdf</field>
+	</record>
 	
  </data>
 </openerp>

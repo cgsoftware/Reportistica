@@ -116,6 +116,12 @@ class fiscaldoc_brogliacci(osv.osv_memory):
                             'report_name': 'dettaglio1', 
                             'datas': data,
                             }
+            else:
+                return {
+                            'type': 'ir.actions.report.xml',
+                            'report_name': 'dettaglio2', 
+                            'datas': data,
+                            }
                 
 
     def check_report(self, cr, uid, ids, context=None):
