@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+
+        
+        <record id="action_trasporti" model="ir.ui.view">
+        
+       
+            <field name="name">genera.stampa.trasporti</field>
+            <field name="model">parcalcolo.trasporti</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string='Parametri di Importazione dati' >
+                    <group col="6" colspan="6">
+                        <field name="dadata" colspan="4" />
+                        <field name="adata" colspan="4" />
+                        <field name="carrier" colspan="4"/>
+                        <newline/>
+                        <field name="zona1" colspan="2"/>
+                        <newline/>
+                        <field name="perc1" colspan="2"/>
+                        
+                        <!-- <field name="zona2" colspan="2"/>-->
+                        <field name="perc2" colspan="2"/>
+                        <newline/>
+                    </group>
+                    <group>
+                    <separator colspan="4"/>
+                        <field name="categoria_ids" colspan="2" mode="tree"  nolabel="1" widget="one2many_list" width="300" height="200">
+                        <tree string="Categorie" editable="bottom">
+                            <field  name="categoria" />
+                        </tree>
+                    </field>
+                    
+                   
+                  
+                        <field name="causale_ids" colspan="2" mode="tree"  nolabel="1" widget="one2many_list" width="300" height="200">
+                        <tree string="Causali" editable="bottom">
+                            <field  name="causale" />
+                        </tree>
+                    </field>
+                    </group>
+                 
+                    
+                    <newline/>
+                   
+                    <group colspan="2" col="4">
+                        <button special="cancel" string="Cancel"  icon="gtk-cancel"/>
+                        <button name="crea_temp" string="Procedi" type="object" icon="gtk-print"/>
+                    </group>
+                </form>
+                
+            </field>
+        </record>
+        
+      
+        
+       
+       
+               
+        <act_window name="Stampa compensi trasportatori per zone"
+            res_model="parcalcolo.trasporti"
+            src_model="parcalcolo.trasporti"
+            view_mode="form"
+            target="new"
+            key2="client_action_multi"
+            id="action_trasporti"/>
+       
+        <menuitem action="action_trasporti" 
+		  		  icon = 'STOCK_JUSTIFY_FILL'
+		          name='Stampa documenti per trasportatore'
+	              id="menu_trasporti" 
+		          parent="menu_stampe_vendite"  sequence="4"/>
+
+    
+    </data>
+</openerp>

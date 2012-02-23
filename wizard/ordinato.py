@@ -1,0 +1,212 @@
+# -*- encoding: utf-8 -*-
+
+import wizard
+import decimal_precision as dp
+import pooler
+import time
+from tools.translate import _
+from osv import osv, fields
+from tools.translate import _
+
+class tempstatistiche_ordinato(osv.osv):
+    def _pulisci(self,cr,uid,context):
+        ids = self.search(cr,uid,[])
+        ok = self.unlink(cr,uid,ids,context)
+        return True
+    _name='tempstatistiche.ordinato'
+    _description = 'Temporaneo ordini in evasione'
+    _columns = {'riga':fields.many2one('sale.order.line', 'Ordine', required=True),
+                'evasa':fields.float('Q.tà Evasa', digits=(12,3)),
+                'daevadere':fields.float('Q.tà da Evadere', digits=(12,3))
+                
+                }
+    def mappa_categoria(self, cr, uid, categoria, context):
+        lista_id=[]
+        
+        for categ in categoria.categoria_ids: 
+            lista_id.append(categ.categoria.id)
+            if categ.categoria.child_id:
+                for child in categ.categoria.child_id:
+                    lista_id.append(child.id)
+        
+        return lista_id
+     
+    def carica_doc(self,cr,uid,parametri,context):
+        #
+        ok = self._pulisci(cr, uid, context)
+        sale = self.pool.get('sale.order')
+        filtro_data = [('date_order','<=', parametri.adata),('date_order','>=', parametri.dadata)]
+        ord_ids = sale.search(cr, uid, filtro_data)
+        
+        
+        
+        if ord_ids:
+            #ho gli id degli ordini nel range di date
+            lista_id=[]
+            if parametri.categoria_ids:
+                #HO UNA CATEGORIA DA ESCLUDERE
+                lista_id = self.mappa_categoria(cr, uid, parametri, context)
+            for ordine in sale.browse(cr, uid, ord_ids):
+                #cerca = [('id','=',ordine.id)]
+                #id_temp = self.search(cr,uid,cerca)
+                for riga_doc in ordine.order_line:
+                    #adesso leggo le righe dell'ordine selezionato
+                    if not riga_doc.product_id.product_tmpl_id.categ_id.id in lista_id:
+                        
+                        if riga_doc.move_ids:
+                        # import pdb;pdb.set_trace()
+                         if parametri.evase==1 or parametri.evase == True : 
+                          for stock in riga_doc.move_ids:
+                                
+                                if stock.state == 'done':
+                                    evasa=stock.product_qty,
+                                    rigawr={'riga':riga_doc.id,
+                                        'evasa':evasa[0],
+                                        'daevadere':riga_doc.product_uom_qty-evasa[0]
+                                        }
+                            
+                                    ok = self.create(cr,uid,rigawr)
+                        else:
+                            
+                                evasa0=0
+                                rigawr={'riga':riga_doc.id,
+                                        'evasa':evasa0,
+                                        'daevadere':riga_doc.product_uom_qty
+                                        }
+                                ok = self.create(cr,uid,rigawr)
+        return 
+                    
+                        
+         
+         
+    
+tempstatistiche_ordinato()
+
+class stampa_ordinato(osv.osv_memory):
+    _name = 'stampa.ordinato'
+    _description = 'funzioni stampa ordini jasper'
+    _columns = {
+                'dadata': fields.date('Da Data Documento', required=True  ),
+                'adata': fields.date('A Data Documento', required=True),
+                'categoria_ids':fields.one2many('parcalcolo.categorie', 'name', 'Categorie da escludere', required=True),
+                'evase': fields.boolean('Stampo anche le righe evase?',required=True),
+                'stampa':fields.selection([('html','HTML'),('csv','CSV'),('rtf','RTF'),('odt','ODT'),('ods','ODS'),('txt','Text'),('pdf','PDF')], 'File di Stampa'),
+                #'dacliente':fields.many2one('res.partner', 'Da cliente', select=True),
+                #'acliente':fields.many2one('res.partner', 'A cliente', select=True),
+                #'danrv': fields.char('Da Documento',size=30,required=True),
+                #'anrv': fields.char('A Documento',size=30,required=True),
+                #'tipodoc':fields.many2one('fiscaldoc.causalidoc', 'Da tipo documento'),
+                #'atipodoc':fields.many2one('fiscaldoc.causalidoc', 'A tipo documento'),
+                #'ordine': fields.selection(  (('T', 'Tipo e Numero Doc'), ('C', 'Cliente'),), 'Tipo di ordinamento', required=True),
+                #'group1':fields.boolean('Raggruppo per cliente?'),
+                #'group2':fields.boolean('Raggruppo per documento?'),
+                #'stampa':fields.boolean('Stampa dettagliata?')
+                #'prezzi':fields.boolean('Stampo i prezzi e gli sconti sull''ordine?'),
+                #'tipo': fields.selection(  (('O', 'Ordine Cliente'), ('P', 'Preventivo a Cliente')), 'Tipo di docuemento')
+                }
+
+    
+    def _build_contexts(self, cr, uid, ids, data, context=None):
+	if context is None:
+            context = {}
+        result = {}
+        result = {'dadata':data['form']['dadata'],'adata':data['form']['adata'] }
+	return result
+      
+
+    def _print_report(self, cr, uid, ids, data, parametri, context=None):
+       
+        if context is None:
+            context = {}
+        data = {}
+        data['ids'] = context.get('active_ids', [])
+        data['model'] = context.get('active_model', 'ir.ui.menu')
+        data['form'] = self.read(cr, uid, ids, ['dadata',  'adata','carrier'])[0] #  'tipodoc', 'atipodoc' 
+        #used_context = self._build_contexts(cr, uid, ids, data, parametri, context=context)
+        #data['form']['parameters'] = used_context
+        pool = pooler.get_pool(cr.dbname)
+        active_ids = context and context.get('active_ids', [])
+        #
+        #data['jasper_output'] = parametri.stampa
+        #
+        report = self.pool.get('ir.actions.report.xml')
+        nome = 'ordinato'
+        filtro =[('report_name','=', nome)]
+        report_id = report.search(cr, uid, filtro)
+        stampa = { 'jasper_output': parametri.stampa, 'report_type':parametri.stampa }
+        riga = report.browse(cr, uid, report_id)[0]
+	#import pdb;pdb.set_trace()        
+	#riga.jasper_output = parametri.stampa
+        #riga.report_type = parametri.stampa
+        #ok = self.write(cr,uid,report_id,stampa)
+        #id =
+        ok = riga.write(stampa)
+	
+	#jasper_report.register_jasper_report( report.report_name, report.model )
+        return {'type': 'ir.actions.report.xml',
+                'report_name': 'ordinato',
+                'datas': data,
+                
+                }
+                
+
+    def check_report(self, cr, uid, ids, context=None):
+        #
+        if context is None:
+            context = {}
+            
+        data = {}
+        data['ids'] = context.get('active_ids', [])
+        data['model'] = context.get('active_model', 'ir.ui.menu')
+        data['form'] = self.read(cr, uid, ids, ['dadata',  'adata'])[0]
+        used_context = self._build_contexts(cr, uid, ids, data, context=context)
+        data['form']['parameters'] = used_context
+        return self._print_report(cr, uid, ids, data, context=context)
+    
+    def view_init(self, cr, uid, fields_list, context=None):
+        # import pdb;pdb.set_trace()
+        res = super(stampa_ordini, self).view_init(cr, uid, fields_list, context=context)
+
+        return res
+    
+             
+    def  default_get(self, cr, uid, fields, context=None):
+       
+        pool = pooler.get_pool(cr.dbname)
+        docs = pool.get('fiscaldoc.header')
+        active_ids = context and context.get('active_ids', [])
+        Primo = True
+        if active_ids:
+             #import pdb;pdb.set_trace()
+             for docu in docs.browse(cr, uid, active_ids, context=context):
+                if Primo:
+                    Primo = False
+        #            DtIni = docu['data_documento']
+        #            NrIni = docu['name']
+                    danr = docu['id']
+                
+         #       DtFin = docu['data_documento']
+      #          NrFin = docu['name']
+                anr = docu['id']                
+        
+        return {}
+    
+    def crea_temp(self, cr, uid, ids, data, context=None):
+        parametri = self.browse(cr,uid,ids)[0]
+        ok = self.pool.get('tempstatistiche.ordinato').carica_doc(cr,uid,parametri,context)
+        
+        #import pdb;pdb.set_trace()
+        return self._print_report(cr, uid, ids, data, parametri, context=context)
+  
+stampa_ordinato()
+
+class parcalcolo_categorie_order(osv.osv_memory):
+    _name = 'parcalcolo.categorie.order' 
+    _description = 'parametri di selezione categorie da escludere'
+    _columns = {'name':fields.many2one('stampa.ordinato','Testata parametri'),
+                'categoria':fields.many2one('product.category', 'Categorie da escludere', required=True,),
+                }
+
+               
+
+

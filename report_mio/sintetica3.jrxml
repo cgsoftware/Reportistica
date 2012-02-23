@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Rag.Doc" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
-	<property name="ireport.zoom" value="1.5"/>
-	<property name="ireport.x" value="133"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="dett_" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="dacliente" class="java.lang.Integer" isForPrompting="false"/>
 	<parameter name="acliente" class="java.lang.Integer" isForPrompting="false"/>
@@ -23,16 +23,10 @@
      fiscaldoc_header."totale_imposta" AS fiscaldoc_header_totale_imposta,
      fiscaldoc_header."totale_acconti" AS fiscaldoc_header_totale_acconti,
      res_partner."name" AS res_partner_name,
-     fiscaldoc_causalidoc."name" AS fiscaldoc_causalidoc_name,
-     conai_castelletto."totale_conai" AS conai_castelletto_totale_conai,
-     account_payment_term."name" AS account_payment_term_name,
-     sale_agent."name" AS sale_agent_name
+     fiscaldoc_causalidoc."name" AS fiscaldoc_causalidoc_name
 FROM
      "public"."res_partner" res_partner RIGHT OUTER JOIN "public"."fiscaldoc_header" fiscaldoc_header ON res_partner."id" = fiscaldoc_header."partner_id"
      LEFT OUTER JOIN "public"."fiscaldoc_causalidoc" fiscaldoc_causalidoc ON fiscaldoc_header."tipo_doc" = fiscaldoc_causalidoc."id"
-     LEFT OUTER JOIN "public"."conai_castelletto" conai_castelletto ON fiscaldoc_header."id" = conai_castelletto."name"
-     LEFT OUTER JOIN "public"."account_payment_term" account_payment_term ON fiscaldoc_header."pagamento_id" = account_payment_term."id"
-     LEFT OUTER JOIN "public"."sale_agent" sale_agent ON fiscaldoc_header."agente" = sale_agent."id"
 WHERE
      fiscaldoc_header."data_documento" >= to_date($P{dadata},'YYYY-MM-DD')
  AND fiscaldoc_header."data_documento" <= to_date($P{adata},'YYYY-MM-DD')
@@ -40,10 +34,7 @@ WHERE
  AND fiscaldoc_header."tipo_doc" <= $P{atipodoc}
  AND fiscaldoc_header."partner_id" >= $P{dacliente}
  AND fiscaldoc_header."partner_id" <= $P{acliente}
- AND fiscaldoc_causalidoc."tipo_operazione" = 'C'
-ORDER BY
-     fiscaldoc_causalidoc."name" ASC,
-     fiscaldoc_header."numdoc" ASC]]>
+ORDER BY fiscaldoc_header."tipo_doc" ASC]]>
 	</queryString>
 	<field name="fiscaldoc_header_id" class="java.lang.Integer"/>
 	<field name="fiscaldoc_header_data_documento" class="java.sql.Date"/>
@@ -58,81 +49,18 @@ ORDER BY
 	<field name="fiscaldoc_header_totale_acconti" class="java.math.BigDecimal"/>
 	<field name="res_partner_name" class="java.lang.String"/>
 	<field name="fiscaldoc_causalidoc_name" class="java.lang.String"/>
-	<field name="conai_castelletto_totale_conai" class="java.math.BigDecimal"/>
-	<field name="account_payment_term_name" class="java.lang.String"/>
-	<field name="sale_agent_name" class="java.lang.String"/>
-	<variable name="imponibile" class="java.math.BigDecimal" calculation="Sum">
+	<variable name="imponibile" class="java.lang.Integer" calculation="Sum">
 		<variableExpression><![CDATA[$F{fiscaldoc_header_totale_imponibile}]]></variableExpression>
 	</variable>
-	<variable name="iva" class="java.math.BigDecimal" calculation="Sum">
+	<variable name="iva" class="java.lang.Integer" calculation="Sum">
 		<variableExpression><![CDATA[$F{fiscaldoc_header_totale_imposta}]]></variableExpression>
 	</variable>
-	<variable name="acconto" class="java.math.BigDecimal" calculation="Sum">
+	<variable name="acconto" class="java.lang.Integer" calculation="Sum">
 		<variableExpression><![CDATA[$F{fiscaldoc_header_totale_acconti}]]></variableExpression>
 	</variable>
-	<variable name="totdoc" class="java.math.BigDecimal" calculation="Sum">
+	<variable name="totdoc" class="java.lang.Integer" calculation="Sum">
 		<variableExpression><![CDATA[$F{fiscaldoc_header_totale_documento}]]></variableExpression>
 	</variable>
-	<variable name="imponibile_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Documento" calculation="Sum">
-		<variableExpression><![CDATA[$F{fiscaldoc_header_totale_imponibile}]]></variableExpression>
-	</variable>
-	<variable name="iva_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Documento" calculation="Sum">
-		<variableExpression><![CDATA[$F{fiscaldoc_header_totale_imposta}]]></variableExpression>
-	</variable>
-	<variable name="acconto_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Documento" calculation="Sum">
-		<variableExpression><![CDATA[$F{fiscaldoc_header_totale_acconti}]]></variableExpression>
-	</variable>
-	<variable name="totdoc_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Documento" calculation="Sum">
-		<variableExpression><![CDATA[$F{fiscaldoc_header_totale_documento}]]></variableExpression>
-	</variable>
-	<variable name="conai_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Documento" calculation="Sum">
-		<variableExpression><![CDATA[$F{conai_castelletto_totale_conai}]]></variableExpression>
-	</variable>
-	<variable name="conai" class="java.math.BigDecimal" calculation="Sum">
-		<variableExpression><![CDATA[$F{conai_castelletto_totale_conai}]]></variableExpression>
-	</variable>
-	<group name="Documento">
-		<groupExpression><![CDATA[$F{fiscaldoc_header_tipo_doc}]]></groupExpression>
-		<groupFooter>
-			<band height="21">
-				<staticText>
-					<reportElement x="0" y="1" width="95" height="20"/>
-					<textElement verticalAlignment="Middle">
-						<font size="9" isBold="true"/>
-					</textElement>
-					<text><![CDATA[Totale documento]]></text>
-				</staticText>
-				<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
-					<reportElement x="378" y="1" width="60" height="20"/>
-					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font size="8"/>
-					</textElement>
-					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{iva_1}]]></textFieldExpression>
-				</textField>
-				<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
-					<reportElement x="500" y="1" width="55" height="20"/>
-					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font size="8"/>
-					</textElement>
-					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{totdoc_1}]]></textFieldExpression>
-				</textField>
-				<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
-					<reportElement x="438" y="1" width="60" height="20"/>
-					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font size="8"/>
-					</textElement>
-					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{conai_1}]]></textFieldExpression>
-				</textField>
-				<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
-					<reportElement x="293" y="1" width="84" height="20"/>
-					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font size="8"/>
-					</textElement>
-					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{imponibile_1}]]></textFieldExpression>
-				</textField>
-			</band>
-		</groupFooter>
-	</group>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -143,7 +71,7 @@ ORDER BY
 				<textElement>
 					<font isBold="true"/>
 				</textElement>
-				<text><![CDATA[Brogliaccio documenti]]></text>
+				<text><![CDATA[Stampa del  fatturato]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="139" y="15" width="33" height="15"/>
@@ -181,134 +109,120 @@ ORDER BY
 	<columnHeader>
 		<band height="20" splitType="Stretch">
 			<staticText>
-				<reportElement x="0" y="0" width="31" height="20"/>
+				<reportElement x="0" y="0" width="41" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Tipo]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="31" y="0" width="36" height="20"/>
+				<reportElement x="41" y="0" width="50" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Data ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="76" y="0" width="80" height="20"/>
+				<reportElement x="92" y="0" width="80" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Numero]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="298" y="0" width="79" height="20"/>
+				<reportElement x="319" y="0" width="79" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Imponibile]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="402" y="0" width="34" height="20"/>
+				<reportElement x="398" y="0" width="34" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[IVA]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="511" y="0" width="44" height="20"/>
+				<reportElement x="432" y="0" width="64" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Acconto]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="496" y="0" width="59" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Totale]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="456" y="0" width="40" height="20"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="12" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Conai]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="212" y="0" width="80" height="20"/>
+				<reportElement x="206" y="0" width="80" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Pagamento]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="183" y="0" width="21" height="20"/>
-				<textElement verticalAlignment="Middle">
-					<font size="12" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Ag.]]></text>
+				<text><![CDATA[Cliente]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
 		<band height="10" splitType="Stretch">
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="0" width="31" height="10"/>
+				<reportElement x="0" y="0" width="41" height="10"/>
 				<textElement>
 					<font size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{fiscaldoc_causalidoc_name}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
-				<reportElement x="27" y="0" width="45" height="10"/>
+				<reportElement x="41" y="0" width="47" height="10"/>
 				<textElement>
 					<font size="7"/>
 				</textElement>
 				<textFieldExpression class="java.util.Date"><![CDATA[$F{fiscaldoc_header_data_documento}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="76" y="0" width="107" height="10"/>
+				<reportElement x="92" y="0" width="106" height="10"/>
 				<textElement>
 					<font size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{fiscaldoc_header_name}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
-				<reportElement x="292" y="0" width="84" height="10"/>
+				<reportElement x="319" y="0" width="79" height="10"/>
 				<textElement textAlignment="Right">
 					<font size="7"/>
 				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscaldoc_header_totale_imponibile}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{fiscaldoc_header_totale_imponibile}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
-				<reportElement x="500" y="0" width="55" height="10"/>
+				<reportElement x="398" y="0" width="34" height="10"/>
 				<textElement textAlignment="Right">
 					<font size="7"/>
 				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscaldoc_header_totale_documento}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{fiscaldoc_header_totale_imposta}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
-				<reportElement x="436" y="0" width="60" height="10"/>
+				<reportElement x="432" y="0" width="64" height="10"/>
 				<textElement textAlignment="Right">
 					<font size="7"/>
 				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{conai_castelletto_totale_conai}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{fiscaldoc_header_totale_acconti}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
-				<reportElement x="376" y="0" width="60" height="10"/>
+				<reportElement x="496" y="0" width="59" height="10"/>
 				<textElement textAlignment="Right">
 					<font size="7"/>
 				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscaldoc_header_totale_imposta}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{fiscaldoc_header_totale_documento}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="204" y="0" width="124" height="10"/>
+				<reportElement x="206" y="0" width="106" height="10"/>
 				<textElement>
 					<font size="7"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{account_payment_term_name}]]></textFieldExpression>
-			</textField>
-			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="186" y="0" width="12" height="10"/>
-				<textElement>
-					<font size="7"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{sale_agent_name}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{res_partner_name}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
@@ -320,55 +234,41 @@ ORDER BY
 	</pageFooter>
 	<lastPageFooter>
 		<band height="50">
+			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
+				<reportElement x="312" y="0" width="79" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{imponibile}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
+				<reportElement x="398" y="0" width="34" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{iva}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
+				<reportElement x="432" y="0" width="64" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{acconto}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
+				<reportElement x="496" y="0" width="59" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{totdoc}]]></textFieldExpression>
+			</textField>
 			<staticText>
-				<reportElement x="127" y="0" width="122" height="20"/>
+				<reportElement x="172" y="0" width="122" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Totale generale]]></text>
 			</staticText>
-			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
-				<reportElement x="297" y="0" width="79" height="20"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{imponibile}]]></textFieldExpression>
-			</textField>
-			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
-				<reportElement x="377" y="0" width="61" height="20"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{iva}]]></textFieldExpression>
-			</textField>
-			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
-				<reportElement x="496" y="0" width="59" height="20"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{totdoc}]]></textFieldExpression>
-			</textField>
-			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
-				<reportElement x="436" y="0" width="60" height="20"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{conai}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement x="76" y="20" width="210" height="20"/>
-				<textElement verticalAlignment="Middle">
-					<font size="12" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Totale imponibile Netto CONAI]]></text>
-			</staticText>
-			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
-				<reportElement x="299" y="20" width="79" height="20"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{imponibile}-$V{conai}]]></textFieldExpression>
-			</textField>
 		</band>
 	</lastPageFooter>
 	<summary>

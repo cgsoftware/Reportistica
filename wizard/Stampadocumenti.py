@@ -25,7 +25,8 @@ class fiscaldoc_brogliacci(osv.osv_memory):
                 'ordine': fields.selection(  (('T', 'Tipo e Numero Doc'), ('C', 'Cliente'),), 'Tipo di ordinamento', required=True),
                 'group1':fields.boolean('Raggruppo per cliente?'),
                 'group2':fields.boolean('Raggruppo per documento?'),
-                'stampa':fields.boolean('Stampa dettagliata?')
+                'stampa':fields.boolean('Stampa dettagliata?'),
+                'agente':fields.many2one('sale.agent', 'Agente', select=True),
                 #'prezzi':fields.boolean('Stampo i prezzi e gli sconti sull''ordine?'),
                 #'tipo': fields.selection(  (('O', 'Ordine Cliente'), ('P', 'Preventivo a Cliente')), 'Tipo di docuemento')
                 }
@@ -39,11 +40,12 @@ class fiscaldoc_brogliacci(osv.osv_memory):
                   'dacliente':data['form']['dacliente'],'acliente':data['form']['acliente'],
                   'tipodoc':data['form']['tipodoc'],'atipodoc':data['form']['atipodoc'],
                   'ordine':data['form']['ordine'], 
-                  'group1':data['form']['group1'], 'group2':data['form']['group2']
+                  'group1':data['form']['group1'], 'group2':data['form']['group2'],
+                  'agente':data['form']['agente'],
                     }
          #funzione di controllo delle variabili 
          # riempie le eventuali lasciate vuote
-
+        
         if data['form']['dacliente']==0 or data['form']['dacliente']==False:
             data['form']['dacliente']= 1
             data['form']['acliente']= 99999
@@ -53,7 +55,14 @@ class fiscaldoc_brogliacci(osv.osv_memory):
             
         var1 = data['form']['group1']
         var2 = data['form']['group2']
+        
+        parametri = self.browse(cr,uid,ids)[0]
         #import pdb;pdb.set_trace()
+        if data['form']['agente']==0 or data['form']['agente']==False :
+            spazio = '%--%'
+            data['form']['agente'] = spazio
+        else:
+            data['form']['agente']=parametri.agente.name
        
     
         if var1 == True or var1 == 1:
@@ -61,24 +70,24 @@ class fiscaldoc_brogliacci(osv.osv_memory):
                 result = {'dadata':data['form']['dadata'],'adata':data['form']['adata'],
                           'dacliente':data['form']['dacliente'],'acliente':data['form']['acliente'],
                           #'danr':data['form']['danrv'],'anr':data['form']['anrv'],
-                          'tipodoc':data['form']['tipodoc'],'ordine':data['form']['ordine'], 
+                          'tipodoc':data['form']['tipodoc'],'ordine':data['form']['ordine'], 'agente':data['form']['agente'],
                           'atipodoc':data['form']['atipodoc'],'group1':1 , 'group2':1}
             else:
                  result = {'dadata':data['form']['dadata'],'adata':data['form']['adata'],
-                          'dacliente':data['form']['dacliente'],'acliente':data['form']['acliente'],
+                          'dacliente':data['form']['dacliente'],'acliente':data['form']['acliente'],'agente':data['form']['agente'],
                           #'danr':data['form']['danrv'],'anr':data['form']['anrv'],
                           'tipodoc':data['form']['tipodoc'],'ordine':data['form']['ordine'], 
                           'atipodoc':data['form']['atipodoc'],'group1':1 , 'group2':0}
         else:
              if var2 == True or var2 == 1:
                  result = {'dadata':data['form']['dadata'],'adata':data['form']['adata'],
-                           'dacliente':data['form']['dacliente'],'acliente':data['form']['acliente'],
+                           'dacliente':data['form']['dacliente'],'acliente':data['form']['acliente'],'agente':data['form']['agente'],
                            #'danr':data['form']['danrv'],'anr':data['form']['anrv'],
                            'tipodoc':data['form']['tipodoc'],'ordine':data['form']['ordine'], 
                           'atipodoc':data['form']['atipodoc'],'group1':0 , 'group2':1}
              else:
                  result = {'dadata':data['form']['dadata'],'adata':data['form']['adata'],
-                           'dacliente':data['form']['dacliente'],'acliente':data['form']['acliente'],
+                           'dacliente':data['form']['dacliente'],'acliente':data['form']['acliente'],'agente':data['form']['agente'],
                            #'danr':data['form']['danrv'],'anr':data['form']['anrv'],
                            'tipodoc':data['form']['tipodoc'],'ordine':data['form']['ordine'], 
                            'atipodoc':data['form']['atipodoc'], 
@@ -132,7 +141,7 @@ class fiscaldoc_brogliacci(osv.osv_memory):
         data = {}
         data['ids'] = context.get('active_ids', [])
         data['model'] = context.get('active_model', 'ir.ui.menu')
-        data['form'] = self.read(cr, uid, ids, ['dadata',  'adata', 'dacliente' , 'acliente', 'danr', 'anr', 'ordine' , 'group1', 'group2' , 'tipodoc', 'atipodoc','stampa' ])[0]
+        data['form'] = self.read(cr, uid, ids, ['dadata', 'agente', 'adata', 'dacliente' , 'acliente', 'danr', 'anr', 'ordine' , 'group1', 'group2' , 'tipodoc', 'atipodoc','stampa' ])[0]
         used_context = self._build_contexts(cr, uid, ids, data, context=context)
         data['form']['parameters'] = used_context
         return self._print_report(cr, uid, ids, data, context=context)

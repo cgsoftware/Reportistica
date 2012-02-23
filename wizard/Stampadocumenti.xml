@@ -1,6 +1,8 @@
 <?xml version="1.0" ?>
 <openerp>
     <data>
+        
+        
         <record id="view_stampa_brogliaccio" model="ir.ui.view">
             <field name="name">Stampa Brogliaccio Documenti di vendita</field>
             <field name="model">fiscaldoc.brogliacci</field>
@@ -13,7 +15,7 @@
                         <field name="acliente" colspan="4"/>
                         <field name="tipodoc" colspan="4"/>
                         <field name="atipodoc" colspan="4"/>
-                        <!--   <field name="ordine" width="300" colspan="4"/> -->
+                        <field name="agente" width="300" colspan="4"/>
                         <field name="group1"/>
                         <field name="group2"/>
                         <field name="stampa"/>	
@@ -41,7 +43,7 @@
 		  		  icon = 'STOCK_EXECUTE'
 		          name='Stampa brogliaccio documenti di vendita'
 	              id="menu_stampa_brocliaccio" 
-		          parent="base.menu_sales"  sequence="6"/>
+		          parent="menu_stampe_vendite"  sequence="1"/>
             
             
         

@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="fatturato" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Key">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="dadata" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="adata" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="tipo_Stampa" class="java.lang.String" isForPrompting="false"/>
+	<queryString>
+		<![CDATA[SELECT
+     tempstatistiche_art."id" AS tempstatistiche_art_id,
+     tempstatistiche_art."create_uid" AS tempstatistiche_art_create_uid,
+     tempstatistiche_art."create_date" AS tempstatistiche_art_create_date,
+     tempstatistiche_art."write_date" AS tempstatistiche_art_write_date,
+     tempstatistiche_art."write_uid" AS tempstatistiche_art_write_uid,
+     tempstatistiche_art."categoria" AS tempstatistiche_art_categoria,
+     tempstatistiche_art."totqty" AS tempstatistiche_art_totqty,
+     tempstatistiche_art."product_id" AS tempstatistiche_art_product_id,
+     tempstatistiche_art."totvalore" AS tempstatistiche_art_totvalore,
+     product_product."variants" AS product_product_variants,
+     product_product."default_code" AS product_product_default_code,
+     marchio_marchio."name" AS marchio_marchio_name,
+     product_product."name_template" AS product_product_name_template,
+     product_product."id" AS product_product_id
+FROM
+     "public"."product_product" product_product RIGHT OUTER JOIN "public"."tempstatistiche_art" tempstatistiche_art ON product_product."id" = tempstatistiche_art."product_id"
+     LEFT OUTER JOIN "public"."marchio_marchio" marchio_marchio ON product_product."marchio_ids" = marchio_marchio."id"
+ORDER BY
+     tempstatistiche_art."categoria" ASC, product_product."id" ASC]]>
+	</queryString>
+	<field name="tempstatistiche_art_id" class="java.lang.Integer"/>
+	<field name="tempstatistiche_art_create_uid" class="java.lang.Integer"/>
+	<field name="tempstatistiche_art_create_date" class="java.sql.Timestamp"/>
+	<field name="tempstatistiche_art_write_date" class="java.sql.Timestamp"/>
+	<field name="tempstatistiche_art_write_uid" class="java.lang.Integer"/>
+	<field name="tempstatistiche_art_categoria" class="java.lang.String"/>
+	<field name="tempstatistiche_art_totqty" class="java.math.BigDecimal"/>
+	<field name="tempstatistiche_art_product_id" class="java.lang.Integer"/>
+	<field name="tempstatistiche_art_totvalore" class="java.math.BigDecimal"/>
+	<field name="product_product_variants" class="java.lang.String"/>
+	<field name="product_product_default_code" class="java.lang.String"/>
+	<field name="marchio_marchio_name" class="java.lang.String"/>
+	<field name="product_product_name_template" class="java.lang.String"/>
+	<field name="product_product_id" class="java.lang.Integer"/>
+	<variable name="spazio" class="java.lang.String">
+		<variableExpression><![CDATA[" "]]></variableExpression>
+		<initialValueExpression><![CDATA[" "]]></initialValueExpression>
+	</variable>
+	<variable name="qty_cat" class="java.math.BigDecimal" resetType="Group" resetGroup="Categoria" calculation="Sum">
+		<variableExpression><![CDATA[$F{tempstatistiche_art_totqty}]]></variableExpression>
+	</variable>
+	<variable name="val_cat" class="java.math.BigDecimal" resetType="Group" resetGroup="Categoria" calculation="Sum">
+		<variableExpression><![CDATA[$F{tempstatistiche_art_totvalore}]]></variableExpression>
+	</variable>
+	<variable name="qty_gen" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{tempstatistiche_art_totqty}]]></variableExpression>
+	</variable>
+	<variable name="val_gen" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{tempstatistiche_art_totvalore}]]></variableExpression>
+	</variable>
+	<group name="Categoria">
+		<groupExpression><![CDATA[$F{tempstatistiche_art_categoria}]]></groupExpression>
+		<groupHeader>
+			<band height="15">
+				<printWhenExpression><![CDATA[$F{tempstatistiche_art_categoria} != "All products"]]></printWhenExpression>
+				<textField>
+					<reportElement x="0" y="0" width="382" height="15"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{tempstatistiche_art_categoria}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="15">
+				<printWhenExpression><![CDATA[$F{tempstatistiche_art_categoria} != "All products"]]></printWhenExpression>
+				<textField>
+					<reportElement x="49" y="0" width="357" height="15"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{tempstatistiche_art_categoria}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="0" width="49" height="15"/>
+					<textElement>
+						<font size="10" isBold="true"/>
+					</textElement>
+					<text><![CDATA[TOTALE]]></text>
+				</staticText>
+				<textField pattern="#,##0.00">
+					<reportElement x="406" y="0" width="75" height="15"/>
+					<textElement textAlignment="Right">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{qty_cat}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="478" y="0" width="77" height="15"/>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{val_cat}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="35" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="78" height="20"/>
+				<textElement/>
+				<text><![CDATA[STAMPA DEL]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="78" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{tipo_Stampa}]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement x="200" y="0" width="60" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{dadata}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="282" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{adata}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="178" y="0" width="22" height="20"/>
+				<textElement/>
+				<text><![CDATA[DAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="260" y="0" width="22" height="20"/>
+				<textElement/>
+				<text><![CDATA[AL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="506" y="0" width="22" height="20"/>
+				<textElement/>
+				<text><![CDATA[Pag.	]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="531" y="0" width="24" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="10" splitType="Stretch">
+			<printWhenExpression><![CDATA[$F{product_product_name_template} != "DDT"]]></printWhenExpression>
+			<textField>
+				<reportElement x="0" y="0" width="382" height="10"/>
+				<textElement>
+					<font size="8" isBold="false" isItalic="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{product_product_default_code}+$V{spazio}+$F{product_product_name_template}+$V{spazio}+$F{product_product_variants}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="431" y="0" width="50" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{tempstatistiche_art_totqty}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="505" y="0" width="50" height="10"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{tempstatistiche_art_totvalore}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<lastPageFooter>
+		<band height="41">
+			<staticText>
+				<reportElement x="0" y="0" width="129" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTALE GENERALE]]></text>
+			</staticText>
+			<textField pattern="#,##0.00">
+				<reportElement x="405" y="0" width="76" height="20"/>
+				<textElement textAlignment="Right">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{qty_gen}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="481" y="0" width="74" height="20"/>
+				<textElement textAlignment="Right">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{val_gen}]]></textFieldExpression>
+			</textField>
+		</band>
+	</lastPageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

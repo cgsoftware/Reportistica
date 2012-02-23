@@ -27,7 +27,7 @@
     """,
     'author': 'C & G Software',
     "depends" : ['base', 'account','mrp'],
-    "update_xml" : [ 'wizard/prepara_view.xml',  'wizard/ordinato.xml',   'wizard/trasportatore_view.xml', #'security/ir.model.access.csv'
+    "update_xml" : [ 'wizard/prepara_view.xml',  'wizard/ordinato.xml'
                     'report.xml','wizard/Stampadocumenti.xml','wizard/fatturato.xml'],
                     
     'website': 'http://www.cgsoftware.it',

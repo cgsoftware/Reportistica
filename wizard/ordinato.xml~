@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data>
+        
+        
+        <record id="view_stampa_ordinato" model="ir.ui.view">
+            <field name="name">Stampa Ordini in corso</field>
+            <field name="model">stampa.ordinato</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                    <form string="Parametri di Stampa"  >
+                        <field name="dadata" colspan="4" />
+                        <field name="adata" colspan="4" width="300" colspan="4"/> 
+                        <separator colspan="4"/>
+                        <group col="4" colspan="4">
+                            <button icon="gtk-cancel" special="cancel" string="Cancel" colspan="2"/>
+                            <button icon="gtk-print" name="check_report" string="Stampa" type="object" colspan="2" default_focus="1" />
+                        </group>
+                    </form>
+                
+            </field>
+        </record>
+        
+
+            
+          <act_window name='action_stampa_ordinato'
+	    			res_model='stampa.ordinato'
+	    			
+	    			view_mode='form'
+	    			target='new'
+	    			key2='client_action_multi'
+	      			id='view_stampa_ordinato' /> 
+	    
+	    <menuitem action="view_stampa_ordinato" 
+		  		  icon = 'STOCK_EXECUTE'
+		          name='Stampa degli ordini in corso'
+	              id="menu_stampa_ordinato" 
+		          parent="menu_stampe_vendite"  sequence="2"/>
+            
+            
+        
+        
+    </data>
+</openerp>
+

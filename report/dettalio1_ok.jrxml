@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Dett.Rag.Cliente" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
 	<property name="ireport.zoom" value="1.5"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.x" value="431"/>
 	<property name="ireport.y" value="0"/>
 	<subDataset name="righe">
 		<queryString language="SQL">
@@ -158,7 +158,7 @@ ORDER BY
 			</band>
 		</groupFooter>
 	</group>
-	<group name="ClienteII" isReprintHeaderOnEachPage="true">
+	<group name="ClienteII">
 		<groupExpression><![CDATA[$F{res_partner_id}]]></groupExpression>
 		<groupHeader>
 			<band height="15">
@@ -228,7 +228,7 @@ ORDER BY
 			</band>
 		</groupFooter>
 	</group>
-	<group name="name" isReprintHeaderOnEachPage="true">
+	<group name="name">
 		<groupExpression><![CDATA[$F{fiscaldoc_header_name}]]></groupExpression>
 		<groupHeader>
 			<band height="26">

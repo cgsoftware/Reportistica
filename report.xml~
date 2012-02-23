@@ -93,28 +93,6 @@
                 <field name="jasper_report">True</field>
                 <field name="jasper_output">pdf</field>
         </record>
-
-	<record id="report_ordini_incorso" model="ir.actions.report.xml">
-                <field name="name">Ordini in corso</field>
-                <field name="type">ir.actions.report.xml</field>
-                <field name="model">sale.order</field>
-                <field name="report_name">ordinato</field>
-                <field name="report_rml">Reportistica/report/ordinato.jrxml</field>
-                <field name="report_type">pdf</field>
-                <field name="jasper_report">True</field>
-                <field name="jasper_output">pdf</field>
-        </record>
-        <record id="report_provviggioni" model="ir.actions.report.xml">
-                <field name="name">Provviggioni Vettore</field>
-                <field name="type">ir.actions.report.xml</field>
-                <field name="model">fiscaldoc.header</field>
-                <field name="report_name">trasportatore</field>
-                <field name="report_rml">Reportistica/report/trasportatore.jrxml</field>
-                <field name="report_type">pdf</field>
-                <field name="jasper_report">True</field>
-                <field name="jasper_output">pdf</field>
-        </record>
-
 	
  </data>
 </openerp>

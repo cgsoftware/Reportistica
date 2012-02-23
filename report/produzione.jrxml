@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="produzione" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="dadata" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="adata" class="java.lang.String" isForPrompting="false"/>
+	<queryString>
+		<![CDATA[SELECT
+     mrp_production."id" AS mrp_production_id,
+     product_product."default_code" AS product_product_default_code,
+     product_product."name_template" AS product_product_name_template,
+     product_product."variants" AS product_product_variants,
+     marchio_marchio."name" AS marchio_marchio_name,
+     product_category."name" AS product_category_name,
+     mrp_production."total_production_cost" AS mrp_production_total_production_cost,
+     mrp_production."product_qty" AS mrp_production_product_qty,
+     mrp_production."date_planned" AS mrp_production_date_planned
+FROM
+     "public"."product_product" product_product RIGHT OUTER JOIN "public"."mrp_production" mrp_production ON product_product."id" = mrp_production."product_id"
+     LEFT OUTER JOIN "public"."product_template" product_template ON product_product."product_tmpl_id" = product_template."id"
+     LEFT OUTER JOIN "public"."marchio_marchio" marchio_marchio ON product_product."marchio_ids" = marchio_marchio."id"
+     INNER JOIN "public"."product_category" product_category ON product_template."categ_id" = product_category."id"
+WHERE
+     mrp_production."state" = 'done'
+ AND mrp_production."date_planned" >= to_date($P{dadata},'YYYY-MM-DD')
+ AND mrp_production."date_planned" <= to_date($P{adata},'YYYY-MM-DD')
+ORDER BY
+     product_product."default_code" ASC,
+     product_category."name" ASC]]>
+	</queryString>
+	<field name="mrp_production_id" class="java.lang.Integer"/>
+	<field name="product_product_default_code" class="java.lang.String"/>
+	<field name="product_product_name_template" class="java.lang.String"/>
+	<field name="product_product_variants" class="java.lang.String"/>
+	<field name="marchio_marchio_name" class="java.lang.String"/>
+	<field name="product_category_name" class="java.lang.String"/>
+	<field name="mrp_production_total_production_cost" class="java.math.BigDecimal"/>
+	<field name="mrp_production_product_qty" class="java.lang.Double"/>
+	<field name="mrp_production_date_planned" class="java.sql.Timestamp"/>
+	<variable name="qty_categ" class="java.lang.Float" resetType="Group" resetGroup="Categoria" calculation="Sum">
+		<variableExpression><![CDATA[$F{mrp_production_product_qty}]]></variableExpression>
+	</variable>
+	<variable name="tot_categ" class="java.lang.Float" resetType="Group" resetGroup="Categoria">
+		<variableExpression><![CDATA[$F{mrp_production_total_production_cost}]]></variableExpression>
+	</variable>
+	<variable name="qty_prd" class="java.lang.Float" resetType="Group" resetGroup="prodotto">
+		<variableExpression><![CDATA[$F{mrp_production_product_qty}]]></variableExpression>
+	</variable>
+	<variable name="tot_prod" class="java.lang.Float" resetType="Group" resetGroup="prodotto">
+		<variableExpression><![CDATA[$F{mrp_production_total_production_cost}]]></variableExpression>
+	</variable>
+	<variable name="spazio" class="java.lang.String">
+		<variableExpression><![CDATA[" "]]></variableExpression>
+		<initialValueExpression><![CDATA[" "]]></initialValueExpression>
+	</variable>
+	<variable name="qty_gen" class="java.lang.Float">
+		<variableExpression><![CDATA[$F{mrp_production_product_qty}]]></variableExpression>
+	</variable>
+	<variable name="tot_gen" class="java.lang.Float">
+		<variableExpression><![CDATA[$F{mrp_production_total_production_cost}]]></variableExpression>
+	</variable>
+	<group name="Categoria">
+		<groupExpression><![CDATA[$F{product_category_name}]]></groupExpression>
+		<groupHeader>
+			<band height="11">
+				<staticText>
+					<reportElement x="0" y="0" width="49" height="10"/>
+					<textElement>
+						<font size="8" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Categoria]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="49" y="0" width="262" height="10"/>
+					<textElement>
+						<font size="8" isBold="true" isItalic="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{product_category_name}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="20">
+				<textField>
+					<reportElement x="65" y="0" width="283" height="20"/>
+					<textElement>
+						<font size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{product_category_name}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="0" width="65" height="20"/>
+					<textElement>
+						<font size="10" isBold="true"/>
+					</textElement>
+					<text><![CDATA[TOTALE]]></text>
+				</staticText>
+				<textField pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement x="359" y="0" width="100" height="20"/>
+					<textElement textAlignment="Right">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Float"><![CDATA[$V{qty_categ}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.0000" isBlankWhenNull="true">
+					<reportElement x="455" y="0" width="100" height="20"/>
+					<textElement textAlignment="Right">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Float"><![CDATA[$V{tot_categ}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="prodotto">
+		<groupExpression><![CDATA[$F{product_product_default_code}]]></groupExpression>
+		<groupFooter>
+			<band height="20">
+				<textField pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement x="359" y="0" width="100" height="20"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Float"><![CDATA[$V{qty_prd}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.0000" isBlankWhenNull="true">
+					<reportElement x="459" y="0" width="96" height="20"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Float"><![CDATA[$V{tot_prod}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="0" width="369" height="20"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{product_product_name_template}+$V{spazio}+$F{product_product_variants}+$V{spazio}+$F{marchio_marchio_name}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="35" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="218" height="20"/>
+				<textElement/>
+				<text><![CDATA[MAINETTI OMAF STAMPA DEL PRODOTTO]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="369" height="20">
+					<printWhenExpression><![CDATA[false]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{product_product_default_code}+$V{spazio}+$F{product_product_name_template}+$V{spazio}+$F{product_product_variants}+$V{spazio}+$F{marchio_marchio_name}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<lastPageFooter>
+		<band height="23">
+			<staticText>
+				<reportElement x="0" y="0" width="115" height="20"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTALE GENERALE]]></text>
+			</staticText>
+			<textField pattern="#,##0.00">
+				<reportElement x="359" y="0" width="100" height="20"/>
+				<textElement textAlignment="Right">
+					<font isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Float"><![CDATA[$V{qty_gen}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.0000">
+				<reportElement x="455" y="0" width="100" height="20"/>
+				<textElement textAlignment="Right">
+					<font isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Float"><![CDATA[$V{tot_gen}]]></textFieldExpression>
+			</textField>
+		</band>
+	</lastPageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

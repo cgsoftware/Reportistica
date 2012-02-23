@@ -20,6 +20,7 @@
 ##############################################################################
 
 import wizard
+#import prepara
 #import produzione
 #import mrp
 #import move
