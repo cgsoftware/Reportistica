@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="dadata" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="adata" class="java.lang.String" isForPrompting="false"/>
+	<queryString>
+		<![CDATA[SELECT
+     fiscaldoc_header."name" AS fiscaldoc_header_name,
+     fiscaldoc_header."data_documento" AS fiscaldoc_header_data_documento,
+     tempstatistiche_trasporti."prov2" AS tempstatistiche_trasporti_prov2,
+     tempstatistiche_trasporti."zona" AS tempstatistiche_trasporti_zona,
+     tempstatistiche_trasporti."prov1" AS tempstatistiche_trasporti_prov1,
+     tempstatistiche_trasporti."imponibile" AS tempstatistiche_trasporti_imponibile,
+     tempstatistiche_trasporti."documento" AS tempstatistiche_trasporti_documento,
+     res_partner."name" AS res_partner_name,
+     sale_agent."name" AS sale_agent_name
+FROM
+     "public"."fiscaldoc_header" fiscaldoc_header RIGHT OUTER JOIN "public"."tempstatistiche_trasporti" tempstatistiche_trasporti ON fiscaldoc_header."id" = tempstatistiche_trasporti."documento"
+     LEFT OUTER JOIN "public"."res_partner" res_partner ON fiscaldoc_header."partner_id" = res_partner."id"
+     LEFT OUTER JOIN "public"."sale_agent" sale_agent ON res_partner."agent_id" = sale_agent."id"
+ORDER BY tempstatistiche_trasporti."zona" ASC]]>
+	</queryString>
+	<field name="fiscaldoc_header_name" class="java.lang.String"/>
+	<field name="fiscaldoc_header_data_documento" class="java.sql.Date"/>
+	<field name="tempstatistiche_trasporti_prov2" class="java.math.BigDecimal"/>
+	<field name="tempstatistiche_trasporti_zona" class="java.lang.String"/>
+	<field name="tempstatistiche_trasporti_prov1" class="java.math.BigDecimal"/>
+	<field name="tempstatistiche_trasporti_imponibile" class="java.math.BigDecimal"/>
+	<field name="tempstatistiche_trasporti_documento" class="java.lang.Integer"/>
+	<field name="res_partner_name" class="java.lang.String"/>
+	<field name="sale_agent_name" class="java.lang.String"/>
+	<group name="Zona">
+		<groupExpression><![CDATA[$F{tempstatistiche_trasporti_zona} == "Martina Franca"]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="34" splitType="Stretch">
+			<staticText>
+				<reportElement x="497" y="0" width="32" height="15"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Pag.]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="529" y="0" width="25" height="15"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="128" height="15"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Provviggioni Vettore]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="128" y="0" width="33" height="15"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[dal]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="161" y="0" width="81" height="15"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{dadata}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="242" y="0" width="33" height="15"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[al]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="275" y="0" width="81" height="15"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{adata}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="41" width="65" height="20"/>
+				<textElement/>
+				<text><![CDATA[Data]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="63" y="41" width="148" height="20"/>
+				<textElement/>
+				<text><![CDATA[Documento]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="306" y="41" width="82" height="20"/>
+				<textElement/>
+				<text><![CDATA[Dest. Consegna]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="388" y="41" width="71" height="20"/>
+				<textElement/>
+				<text><![CDATA[Imponibile]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="459" y="41" width="96" height="20"/>
+				<textElement/>
+				<text><![CDATA[Provviggione]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="211" y="41" width="95" height="20"/>
+				<textElement/>
+				<text><![CDATA[Cliente]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="50" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="65" height="15"/>
+				<textElement/>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{fiscaldoc_header_data_documento}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="65" y="0" width="146" height="15"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{fiscaldoc_header_name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="306" y="0" width="82" height="15"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{tempstatistiche_trasporti_zona}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="388" y="0" width="71" height="15"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{tempstatistiche_trasporti_imponibile}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="459" y="0" width="46" height="15"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{tempstatistiche_trasporti_prov1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="505" y="0" width="50" height="15"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{tempstatistiche_trasporti_prov2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="211" y="0" width="95" height="15"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{res_partner_name}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

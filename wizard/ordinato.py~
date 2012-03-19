@@ -9,12 +9,10 @@ from osv import osv, fields
 from tools.translate import _
 
 class tempstatistiche_ordinato(osv.osv):
-    
     def _pulisci(self,cr,uid,context):
         ids = self.search(cr,uid,[])
         ok = self.unlink(cr,uid,ids,context)
         return True
-    
     _name='tempstatistiche.ordinato'
     _description = 'Temporaneo ordini in evasione'
     _columns = {'riga':fields.many2one('sale.order.line', 'Ordine', required=True),
@@ -38,8 +36,10 @@ class tempstatistiche_ordinato(osv.osv):
         ok = self._pulisci(cr, uid, context)
         sale = self.pool.get('sale.order')
         filtro_data = [('date_order','<=', parametri.adata),('date_order','>=', parametri.dadata)]
-        #filtro_data = [('name','=','CO0000083-2012')]
         ord_ids = sale.search(cr, uid, filtro_data)
+        
+        
+        
         if ord_ids:
             #ho gli id degli ordini nel range di date
             lista_id=[]
@@ -49,16 +49,15 @@ class tempstatistiche_ordinato(osv.osv):
             for ordine in sale.browse(cr, uid, ord_ids):
                 #cerca = [('id','=',ordine.id)]
                 #id_temp = self.search(cr,uid,cerca)
-              if ordine.order_line:
                 for riga_doc in ordine.order_line:
                     #adesso leggo le righe dell'ordine selezionato
-		 if riga_doc.product_id:
-
-                    if not riga_doc.product_id.product_tmpl_id.categ_id.id in lista_id:                        
+                    if not riga_doc.product_id.product_tmpl_id.categ_id.id in lista_id:
+                        
                         if riga_doc.move_ids:
-                         #import pdb;pdb.set_trace()
-                         for stock in riga_doc.move_ids:
-                          if parametri.evase==1 or parametri.evase == True :       
+                        # import pdb;pdb.set_trace()
+                         if parametri.evase==1 or parametri.evase == True : 
+                          for stock in riga_doc.move_ids:
+                                
                                 if stock.state == 'done':
                                     evasa=stock.product_qty,
                                     rigawr={'riga':riga_doc.id,
@@ -67,25 +66,6 @@ class tempstatistiche_ordinato(osv.osv):
                                         }
                             
                                     ok = self.create(cr,uid,rigawr)
-                                else:
-                                    evasa0=0
-                                    rigawr={'riga':riga_doc.id,
-                                        'evasa':evasa0,
-                                        'daevadere':riga_doc.product_uom_qty
-                                        }
-                            
-                                    ok = self.create(cr,uid,rigawr)
-                          else:
-                             if riga_doc.product_uom_qty <> stock.product_qty:  
-                              if stock.state == 'done':
-                                    evasa=stock.product_qty,
-                                    rigawr={'riga':riga_doc.id,
-                                        'evasa':evasa[0],
-                                        'daevadere':riga_doc.product_uom_qty-evasa[0]
-                                        }
-                            
-                                    ok = self.create(cr,uid,rigawr)
-                                
                         else:
                             
                                 evasa0=0
@@ -110,7 +90,7 @@ class stampa_ordinato(osv.osv_memory):
                 'adata': fields.date('A Data Documento', required=True),
                 'categoria_ids':fields.one2many('parcalcolo.categorie', 'name', 'Categorie da escludere', required=True),
                 'evase': fields.boolean('Stampo anche le righe evase?',required=True),
-                'stampa':fields.selection([('html','HTML'),('csv','CSV'),('rtf','RTF'),('odt','ODT'),('ods','ODS'),('txt','Text'),('pdf','PDF')], 'File di Stampa'),
+                'stampa':fields.selection([('html','HTML'),('csv','CSV'),('xls','XLS'),('rtf','RTF'),('odt','ODT'),('ods','ODS'),('txt','Text'),('pdf','PDF')], 'File di Stampa'),
                 #'dacliente':fields.many2one('res.partner', 'Da cliente', select=True),
                 #'acliente':fields.many2one('res.partner', 'A cliente', select=True),
                 #'danrv': fields.char('Da Documento',size=30,required=True),
@@ -124,9 +104,7 @@ class stampa_ordinato(osv.osv_memory):
                 #'prezzi':fields.boolean('Stampo i prezzi e gli sconti sull''ordine?'),
                 #'tipo': fields.selection(  (('O', 'Ordine Cliente'), ('P', 'Preventivo a Cliente')), 'Tipo di docuemento')
                 }
-    _defaults = {
-		 'stampa':'pdf',
-		}
+
     
     def _build_contexts(self, cr, uid, ids, data, context=None):
 	if context is None:

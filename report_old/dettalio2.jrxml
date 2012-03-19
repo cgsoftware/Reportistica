@@ -35,9 +35,6 @@ ORDER BY
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["./"]]></defaultValueExpression>
 	</parameter>
-	<parameter name="agente" class="java.lang.Integer">
-		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
-	</parameter>
 	<queryString>
 		<![CDATA[SELECT
      fiscaldoc_header."id" AS fiscaldoc_header_id,
@@ -64,9 +61,7 @@ ORDER BY
      fiscaldoc_righe."id" AS fiscaldoc_righe_id,
      fiscaldoc_causalidoc."tipo_operazione" AS fiscaldoc_causalidoc_tipo_operazione,
      fiscaldoc_righe."prezzo_conai" AS fiscaldoc_righe_prezzo_conai,
-     account_payment_term."name" AS account_payment_term_name,
-     fiscaldoc_header."differita_id" AS fiscaldoc_header_differita_id,
-     res_partner."agent_id" AS res_partner_agent_id
+     account_payment_term."name" AS account_payment_term_name
 FROM
      "public"."res_partner" res_partner RIGHT OUTER JOIN "public"."fiscaldoc_header" fiscaldoc_header ON res_partner."id" = fiscaldoc_header."partner_id"
      LEFT OUTER JOIN "public"."fiscaldoc_causalidoc" fiscaldoc_causalidoc ON fiscaldoc_header."tipo_doc" = fiscaldoc_causalidoc."id"
@@ -82,9 +77,6 @@ WHERE
  AND fiscaldoc_header."partner_id" >= $P{dacliente}
  AND fiscaldoc_header."partner_id" <= $P{acliente}
  AND fiscaldoc_causalidoc."tipo_operazione" = 'C'
- AND (res_partner."agent_id" = $P{agente}
-  OR $P{agente} = 0)
- AND fiscaldoc_header."differita_id" IS null
 ORDER BY
      fiscaldoc_header."partner_id" ASC,
      fiscaldoc_righe."id" ASC]]>
@@ -114,7 +106,6 @@ ORDER BY
 	<field name="fiscaldoc_causalidoc_tipo_operazione" class="java.lang.String"/>
 	<field name="fiscaldoc_righe_prezzo_conai" class="java.math.BigDecimal"/>
 	<field name="account_payment_term_name" class="java.lang.String"/>
-	<field name="fiscaldoc_header_differita_id" class="java.lang.Integer"/>
 	<variable name="imponibile" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$F{fiscaldoc_header_totale_imponibile}]]></variableExpression>
 	</variable>

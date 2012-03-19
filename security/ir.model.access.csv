@@ -1,2 +1,3 @@
-id;name;model_id:id;group_id:id;perm_read;perm_write;perm_create;perm_unlink
-access_tempstatistiche_art;tempstatistiche.art;model_tempstatistiche_art;;1;1;1;1
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_tempstatistiche_art,tempstatistiche.art,model_tempstatistiche_art,,1,1,1,1
+access_tempstatistiche_ordinato,tempstatistiche.ordinato,model_tempstatistiche_ordinato,,1,1,1,1

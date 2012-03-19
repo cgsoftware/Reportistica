@@ -250,7 +250,6 @@ class parcalcolo_fatturato(osv.osv_memory):
         data['model'] = context.get('active_model', 'ir.ui.menu')
         data['form'] = self.read(cr, uid, ids, ['dadata',  'adata','tipo_Stampa','categoria'])[0] #  'tipodoc', 'atipodoc' 
         used_context = self._build_contexts(cr, uid, ids, data, parametri, context=context)
-        import pdb;pdb.set_trace()
         data['form']['parameters'] = used_context
         pool = pooler.get_pool(cr.dbname)
         #fatture = pool.get('fiscaldoc.header')
@@ -261,7 +260,6 @@ class parcalcolo_fatturato(osv.osv_memory):
                    'report_name': 'categorie',
                    #'report_name': 'fatturato',
                    'datas': data,
-                   
                    }
         else:
             return {'type': 'ir.actions.report.xml',

@@ -24,7 +24,7 @@ import Stampadocumenti
 import fatturato
 import prepara
 import ordinato
-import trasportatore
+#import trasportatore
 
 
 

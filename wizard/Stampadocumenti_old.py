@@ -58,10 +58,11 @@ class fiscaldoc_brogliacci(osv.osv_memory):
         
         parametri = self.browse(cr,uid,ids)[0]
         #import pdb;pdb.set_trace()
-        if parametri.agente:
-            data['form']['agente']=parametri.agente.id
+        if data['form']['agente']==0 or data['form']['agente']==False :
+            spazio = '%--%'
+            data['form']['agente'] = spazio
         else:
-             data['form']['agente']= 0  
+            data['form']['agente']=parametri.agente.name
        
     
         if var1 == True or var1 == 1:
