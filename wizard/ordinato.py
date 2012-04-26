@@ -44,7 +44,7 @@ class tempstatistiche_ordinato(osv.osv):
             #ho gli id degli ordini nel range di date
             lista_id=[]
             if parametri.categoria_ids:
-                #HO UNA CATEGORIA DA ESCLUDERE
+                #HO UNA CATEGORIA DA INCLUDERE
                 lista_id = self.mappa_categoria(cr, uid, parametri, context)
             for ordine in sale.browse(cr, uid, ord_ids):
                 #cerca = [('id','=',ordine.id)]
@@ -54,46 +54,57 @@ class tempstatistiche_ordinato(osv.osv):
                     #adesso leggo le righe dell'ordine selezionato
 		 if riga_doc.product_id:
 
-                    if not riga_doc.product_id.product_tmpl_id.categ_id.id in lista_id:                        
+                    if riga_doc.product_id.product_tmpl_id.categ_id.id in lista_id:                        
                         if riga_doc.move_ids:
                          #import pdb;pdb.set_trace()
                          for stock in riga_doc.move_ids:
-                          if parametri.evase==1 or parametri.evase == True :       
-                                if stock.state == 'done':
-                                    evasa=stock.product_qty,
-                                    rigawr={'riga':riga_doc.id,
-                                        'evasa':evasa[0],
-                                        'daevadere':riga_doc.product_uom_qty-evasa[0]
-                                        }
-                            
-                                    ok = self.create(cr,uid,rigawr)
-                                else:
-                                    evasa0=0
-                                    rigawr={'riga':riga_doc.id,
-                                        'evasa':evasa0,
-                                        'daevadere':riga_doc.product_uom_qty
-                                        }
-                            
-                                    ok = self.create(cr,uid,rigawr)
-                          else:
-                             if riga_doc.product_uom_qty <> stock.product_qty:  
+                          if parametri.evase==1 or parametri.evase == True : 
+                              #DEVE STAMPARE ANCHE LE RIGHE GIA' EVASE      
                               if stock.state == 'done':
-                                    evasa=stock.product_qty,
-                                    rigawr={'riga':riga_doc.id,
-                                        'evasa':evasa[0],
-                                        'daevadere':riga_doc.product_uom_qty-evasa[0]
-                                        }
-                            
-                                    ok = self.create(cr,uid,rigawr)
-                                
-                        else:
-                            
-                                evasa0=0
-                                rigawr={'riga':riga_doc.id,
-                                        'evasa':evasa0,
-                                        'daevadere':riga_doc.product_uom_qty
-                                        }
-                                ok = self.create(cr,uid,rigawr)
+                                  evasa=stock.product_qty,
+                                  if stock.product_qty <= riga_doc.product_uom_qty:
+                                      rigawr={'riga':riga_doc.id,
+                                              'evasa':evasa[0],
+                                              'daevadere':riga_doc.product_uom_qty-evasa[0]
+                                              }
+                                      ok = self.create(cr,uid,rigawr)
+                                  else:
+                                      rigawr={'riga':riga_doc.id,
+                                              'evasa':stock.product_qty,
+                                              'daevadere':0
+                                              }
+                                      ok = self.create(cr,uid,rigawr)
+                              else:
+                                  evasa0=0
+                                  rigawr={'riga':riga_doc.id,
+                                          'evasa':evasa0,
+                                          'daevadere':riga_doc.product_uom_qty
+                                          }
+                                  ok = self.create(cr,uid,rigawr)
+                          else:
+                              #SOLO RIGHE DA EVADERE
+                              #import pdb;pdb.set_trace()
+                              if stock.state == 'done':
+                                  evasa=stock.product_qty,
+                                  if stock.product_qty <= riga_doc.product_uom_qty:
+                                      rigawr={'riga':riga_doc.id,
+                                              'evasa':evasa[0],
+                                              'daevadere':riga_doc.product_uom_qty-evasa[0]
+                                              }
+                                      if riga_doc.product_uom_qty-evasa[0]>0:
+                                          ok = self.create(cr,uid,rigawr)
+                                      else:
+                                          rigawr={}
+                              else:
+                                  rigawr={'riga':riga_doc.id,
+                                          'evasa':0,
+                                          'daevadere':riga_doc.product_uom_qty,
+                                              }
+                                  ok = self.create(cr,uid,rigawr)
+                              
+                                 
+                                      
+                                      
         return 
                     
                         
@@ -108,7 +119,7 @@ class stampa_ordinato(osv.osv_memory):
     _columns = {
                 'dadata': fields.date('Da Data Documento', required=True  ),
                 'adata': fields.date('A Data Documento', required=True),
-                'categoria_ids':fields.one2many('parcalcolo.categorie', 'name', 'Categorie da escludere', required=True),
+                'categoria_ids':fields.one2many('parcalcolo.categorie.order', 'name', 'Categorie da Includere', required=True),
                 'evase': fields.boolean('Stampo anche le righe evase?',required=True),
                 'stampa':fields.selection([('html','HTML'),('csv','CSV'),('rtf','RTF'),('odt','ODT'),('ods','ODS'),('txt','Text'),('pdf','PDF')], 'File di Stampa'),
                 #'dacliente':fields.many2one('res.partner', 'Da cliente', select=True),
@@ -226,8 +237,9 @@ class parcalcolo_categorie_order(osv.osv_memory):
     _name = 'parcalcolo.categorie.order' 
     _description = 'parametri di selezione categorie da escludere'
     _columns = {'name':fields.many2one('stampa.ordinato','Testata parametri'),
-                'categoria':fields.many2one('product.category', 'Categorie da escludere', required=True,),
+                'categoria':fields.many2one('product.category', 'Categorie da includere', required=True,),
                 }
+parcalcolo_categorie_order()
 
                
 

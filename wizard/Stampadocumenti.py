@@ -8,6 +8,82 @@ from tools.translate import _
 from osv import osv, fields
 from tools.translate import _
 
+class tempstatistiche_brogliacci(osv.osv):
+    def _pulisci(self,cr,uid,context):
+        ids = self.search(cr,uid,[])
+        ok = self.unlink(cr,uid,ids,context)
+        return True
+    
+    _name ='tempstatistiche.brogliacci'
+    _description = 'temporaneo per la stampa dei brogliacci'
+    _columns = {#'documento':fields.many2one('fiscaldoc.header', 'Numero Documento'),
+                'imponibile':fields.float('Imponibile', digits=(16, 4)),
+                'imposta':fields.float('Imposta', digits=(16, 4)),
+                'totale':fields.float('Totale', digits=(16, 4)),
+                'conai':fields.float('Conai', digits=(16, 4)),
+                'documento':fields.float('Conai', digits=(16, 4)),
+                                          
+                }
+    
+    def carica_doc(self, cr,uid,parametri,context):
+        #import pdb;pdb.set_trace()
+        ok = self._pulisci(cr, uid, context)
+        testa_obj = self.pool.get('fiscaldoc.header')
+        partner_obj = self.pool.get('res.partner')
+        conai = self.pool.get('conai.castelletto')
+        #filtro1 = [('tipo_documento', 'in', ('FA','FI','FD','NC'))] #AGGIUNGERE NOTE CREDITO E NOTE DEBITO
+        #idsTipoDoc = self.pool.get('fiscaldoc.causalidoc').search(cr, uid, filtro1)
+        #idsTipoDoc = tuple(idsTipoDoc)
+        if parametri.agente:
+            filtro_ag =[('agent_id','=',parametri.agente.id)]
+            partner_ids = partner_obj.search(cr, uid, filtro_ag)
+            partner_ids = tuple(partner_ids)
+            filtro2 = [('partner_id', 'in', partner_ids),('data_documento','<=',parametri.adata ),('data_documento','>=', parametri.dadata )]
+        elif parametri.dacliente:
+            filtro2 = [('data_documento','<=',parametri.adata ),('data_documento','>=', parametri.dadata ), ('partner_id', '=', parametri.dacliente.id)]
+        elif parametri.tipodoc:
+            filtro2 = [('data_documento','<=',parametri.adata ),('data_documento','>=', parametri.dadata ), ('tipo_doc', '=', parametri.tipodoc.id)]
+        else:
+            filtro2 = [('data_documento','<=',parametri.adata ),('data_documento','>=', parametri.dadata )]
+        
+        doc = testa_obj.search(cr, uid, filtro2)
+        
+        if doc:
+            for documento in testa_obj.browse(cr, uid, doc):
+                cerca = [('name', '=', documento.id)]
+                righe_conai = conai.search(cr, uid, cerca)
+                tot = 0
+                if righe_conai:
+                    #import pdb;pdb.set_trace()
+                    for riga in conai.browse(cr,uid, righe_conai):
+                        
+                        tot += riga.totale_conai
+                if documento.tipo_doc.tipo_operazione == 'C':
+                 if not documento.differita_id:
+                 #import pdb;pdb.set_trace()
+                  if documento.tipo_doc.tipo_documento == 'NC':
+                    
+                    rigawr={'documento': documento.id,
+                            'totale': documento.totale_documento * -1,
+                            'imposta': documento.totale_imposta * -1,
+                            'imponibile': documento.totale_imponibile * -1,
+                            'conai':tot*-1
+                            }
+                    ok = self.create(cr, uid, rigawr)
+                  else:
+                    riga={'documento': documento.id,
+                            'totale': documento.totale_documento,
+                            'imposta': documento.totale_imposta,
+                            'imponibile': documento.totale_imponibile,
+                            'conai':tot}                            
+                    ok = self.create(cr, uid, riga)
+        return True
+    
+                    
+        
+        
+
+tempstatistiche_brogliacci()
 
 
 class fiscaldoc_brogliacci(osv.osv_memory):
@@ -48,11 +124,11 @@ class fiscaldoc_brogliacci(osv.osv_memory):
         
         if data['form']['dacliente']==0 or data['form']['dacliente']==False:
             data['form']['dacliente']= 1
-            data['form']['acliente']= 99999
+            
         if data['form']['tipodoc']==0 or data['form']['tipodoc']==False:
             data['form']['tipodoc']=1
             data['form']['atipodoc']=99999
-            
+        data['form']['acliente']= 0    
         var1 = data['form']['group1']
         var2 = data['form']['group2']
         
@@ -143,6 +219,9 @@ class fiscaldoc_brogliacci(osv.osv_memory):
         data['form'] = self.read(cr, uid, ids, ['dadata', 'agente', 'adata', 'dacliente' , 'acliente', 'danr', 'anr', 'ordine' , 'group1', 'group2' , 'tipodoc', 'atipodoc','stampa' ])[0]
         used_context = self._build_contexts(cr, uid, ids, data, context=context)
         data['form']['parameters'] = used_context
+        parametri = self.browse(cr,uid,ids)[0]
+        ok = self.pool.get('tempstatistiche.brogliacci').carica_doc(cr,uid,parametri,context)
+        
         return self._print_report(cr, uid, ids, data, context=context)
     
     def view_init(self, cr, uid, fields_list, context=None):

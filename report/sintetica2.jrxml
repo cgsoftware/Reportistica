@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Rag.Doc" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
-	<property name="ireport.zoom" value="1.5"/>
-	<property name="ireport.x" value="592"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="262"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="dacliente" class="java.lang.Integer" isForPrompting="false"/>
 	<parameter name="acliente" class="java.lang.Integer" isForPrompting="false"/>
@@ -27,31 +27,31 @@
      fiscaldoc_header."totale_acconti" AS fiscaldoc_header_totale_acconti,
      res_partner."name" AS res_partner_name,
      fiscaldoc_causalidoc."name" AS fiscaldoc_causalidoc_name,
-     conai_castelletto."totale_conai" AS conai_castelletto_totale_conai,
      account_payment_term."name" AS account_payment_term_name,
      sale_agent."name" AS sale_agent_name,
-     res_partner."agent_id" AS res_partner_agent_id,
-     fiscaldoc_header."differita_id" AS fiscaldoc_header_differita_id
+     res_bank."name" AS res_bank_name,
+     sale_agent."id" AS sale_agent_id,
+     fiscaldoc_header."differita_id" AS fiscaldoc_header_differita_id,
+     tempstatistiche_brogliacci."id" AS tempstatistiche_brogliacci_id,
+     tempstatistiche_brogliacci."create_uid" AS tempstatistiche_brogliacci_create_uid,
+     tempstatistiche_brogliacci."create_date" AS tempstatistiche_brogliacci_create_date,
+     tempstatistiche_brogliacci."write_date" AS tempstatistiche_brogliacci_write_date,
+     tempstatistiche_brogliacci."write_uid" AS tempstatistiche_brogliacci_write_uid,
+     tempstatistiche_brogliacci."totale" AS tempstatistiche_brogliacci_totale,
+     tempstatistiche_brogliacci."imponibile" AS tempstatistiche_brogliacci_imponibile,
+     tempstatistiche_brogliacci."conai" AS tempstatistiche_brogliacci_conai,
+     tempstatistiche_brogliacci."imposta" AS tempstatistiche_brogliacci_imposta,
+     tempstatistiche_brogliacci."documento" AS tempstatistiche_brogliacci_documento
 FROM
      "public"."res_partner" res_partner RIGHT OUTER JOIN "public"."fiscaldoc_header" fiscaldoc_header ON res_partner."id" = fiscaldoc_header."partner_id"
      LEFT OUTER JOIN "public"."fiscaldoc_causalidoc" fiscaldoc_causalidoc ON fiscaldoc_header."tipo_doc" = fiscaldoc_causalidoc."id"
-     LEFT OUTER JOIN "public"."conai_castelletto" conai_castelletto ON fiscaldoc_header."id" = conai_castelletto."name"
      LEFT OUTER JOIN "public"."account_payment_term" account_payment_term ON fiscaldoc_header."pagamento_id" = account_payment_term."id"
+     LEFT OUTER JOIN "public"."res_bank" res_bank ON fiscaldoc_header."banca_patner" = res_bank."id"
+     RIGHT OUTER JOIN "public"."tempstatistiche_brogliacci" tempstatistiche_brogliacci ON fiscaldoc_header."id" = tempstatistiche_brogliacci."documento"
      LEFT OUTER JOIN "public"."sale_agent" sale_agent ON res_partner."agent_id" = sale_agent."id"
-WHERE
-     fiscaldoc_header."data_documento" >= to_date($P{dadata},'YYYY-MM-DD')
- AND fiscaldoc_header."data_documento" <= to_date($P{adata},'YYYY-MM-DD')
- AND fiscaldoc_header."tipo_doc" >= $P{tipodoc}
- AND fiscaldoc_header."tipo_doc" <= $P{atipodoc}
- AND fiscaldoc_header."partner_id" >= $P{dacliente}
- AND fiscaldoc_header."partner_id" <= $P{acliente}
- AND fiscaldoc_causalidoc."tipo_operazione" = 'C'
- AND (res_partner."agent_id" = $P{agente}
-  OR $P{agente} = 0)
- AND fiscaldoc_header."differita_id" IS null
+
 ORDER BY
-     fiscaldoc_causalidoc."name" ASC,
-     fiscaldoc_header."numdoc" ASC]]>
+     fiscaldoc_header."name" ASC]]>
 	</queryString>
 	<field name="fiscaldoc_header_id" class="java.lang.Integer"/>
 	<field name="fiscaldoc_header_data_documento" class="java.sql.Date"/>
@@ -66,40 +66,50 @@ ORDER BY
 	<field name="fiscaldoc_header_totale_acconti" class="java.math.BigDecimal"/>
 	<field name="res_partner_name" class="java.lang.String"/>
 	<field name="fiscaldoc_causalidoc_name" class="java.lang.String"/>
-	<field name="conai_castelletto_totale_conai" class="java.math.BigDecimal"/>
 	<field name="account_payment_term_name" class="java.lang.String"/>
 	<field name="sale_agent_name" class="java.lang.String"/>
-	<field name="res_partner_agent_id" class="java.lang.Integer"/>
+	<field name="res_bank_name" class="java.lang.String"/>
+	<field name="sale_agent_id" class="java.lang.Integer"/>
 	<field name="fiscaldoc_header_differita_id" class="java.lang.Integer"/>
+	<field name="tempstatistiche_brogliacci_id" class="java.lang.Integer"/>
+	<field name="tempstatistiche_brogliacci_create_uid" class="java.lang.Integer"/>
+	<field name="tempstatistiche_brogliacci_create_date" class="java.sql.Timestamp"/>
+	<field name="tempstatistiche_brogliacci_write_date" class="java.sql.Timestamp"/>
+	<field name="tempstatistiche_brogliacci_write_uid" class="java.lang.Integer"/>
+	<field name="tempstatistiche_brogliacci_totale" class="java.math.BigDecimal"/>
+	<field name="tempstatistiche_brogliacci_imponibile" class="java.math.BigDecimal"/>
+	<field name="tempstatistiche_brogliacci_conai" class="java.math.BigDecimal"/>
+	<field name="tempstatistiche_brogliacci_imposta" class="java.math.BigDecimal"/>
+	<field name="tempstatistiche_brogliacci_documento" class="java.math.BigDecimal"/>
 	<variable name="imponibile" class="java.math.BigDecimal" calculation="Sum">
-		<variableExpression><![CDATA[$F{fiscaldoc_header_totale_imponibile}]]></variableExpression>
+		<variableExpression><![CDATA[$F{tempstatistiche_brogliacci_imponibile}]]></variableExpression>
 	</variable>
 	<variable name="iva" class="java.math.BigDecimal" calculation="Sum">
-		<variableExpression><![CDATA[$F{fiscaldoc_header_totale_imposta}]]></variableExpression>
+		<variableExpression><![CDATA[$F{tempstatistiche_brogliacci_imposta}]]></variableExpression>
 	</variable>
 	<variable name="acconto" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$F{fiscaldoc_header_totale_acconti}]]></variableExpression>
 	</variable>
 	<variable name="totdoc" class="java.math.BigDecimal" calculation="Sum">
-		<variableExpression><![CDATA[$F{fiscaldoc_header_totale_documento}]]></variableExpression>
+		<variableExpression><![CDATA[$F{tempstatistiche_brogliacci_totale}]]></variableExpression>
 	</variable>
 	<variable name="imponibile_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Documento" calculation="Sum">
-		<variableExpression><![CDATA[$F{fiscaldoc_header_totale_imponibile}]]></variableExpression>
+		<variableExpression><![CDATA[$F{tempstatistiche_brogliacci_imponibile}]]></variableExpression>
 	</variable>
 	<variable name="iva_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Documento" calculation="Sum">
-		<variableExpression><![CDATA[$F{fiscaldoc_header_totale_imposta}]]></variableExpression>
+		<variableExpression><![CDATA[$F{tempstatistiche_brogliacci_imposta}]]></variableExpression>
 	</variable>
 	<variable name="acconto_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Documento" calculation="Sum">
 		<variableExpression><![CDATA[$F{fiscaldoc_header_totale_acconti}]]></variableExpression>
 	</variable>
 	<variable name="totdoc_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Documento" calculation="Sum">
-		<variableExpression><![CDATA[$F{fiscaldoc_header_totale_documento}]]></variableExpression>
+		<variableExpression><![CDATA[$F{tempstatistiche_brogliacci_totale}]]></variableExpression>
 	</variable>
 	<variable name="conai_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Documento" calculation="Sum">
-		<variableExpression><![CDATA[$F{conai_castelletto_totale_conai}]]></variableExpression>
+		<variableExpression><![CDATA[$F{tempstatistiche_brogliacci_conai}]]></variableExpression>
 	</variable>
 	<variable name="conai" class="java.math.BigDecimal" calculation="Sum">
-		<variableExpression><![CDATA[$F{conai_castelletto_totale_conai}]]></variableExpression>
+		<variableExpression><![CDATA[$F{tempstatistiche_brogliacci_conai}]]></variableExpression>
 	</variable>
 	<group name="Documento">
 		<groupExpression><![CDATA[$F{fiscaldoc_header_tipo_doc}]]></groupExpression>
@@ -314,28 +324,28 @@ ORDER BY
 				<textElement textAlignment="Right">
 					<font size="7"/>
 				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscaldoc_header_totale_imponibile}]]></textFieldExpression>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{tempstatistiche_brogliacci_imponibile}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
 				<reportElement x="747" y="0" width="55" height="10" forecolor="#1924E4"/>
 				<textElement textAlignment="Right">
 					<font size="7"/>
 				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscaldoc_header_totale_documento}]]></textFieldExpression>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{tempstatistiche_brogliacci_totale}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
 				<reportElement x="683" y="0" width="60" height="10" forecolor="#1924E4"/>
 				<textElement textAlignment="Right">
 					<font size="7"/>
 				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{conai_castelletto_totale_conai}]]></textFieldExpression>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{tempstatistiche_brogliacci_conai}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
 				<reportElement x="623" y="0" width="60" height="10" forecolor="#1924E4"/>
 				<textElement textAlignment="Right">
 					<font size="7"/>
 				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fiscaldoc_header_totale_imposta}]]></textFieldExpression>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{tempstatistiche_brogliacci_imposta}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
 				<reportElement x="399" y="0" width="124" height="10" forecolor="#1924E4"/>

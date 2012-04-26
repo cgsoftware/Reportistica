@@ -28,7 +28,7 @@
     'author': 'C & G Software',
     "depends" : ['base', 'account','mrp'],
     "update_xml" : [ 'wizard/prepara_view.xml',  'wizard/ordinato.xml','security/ir.model.access.csv',
-                    'report.xml','wizard/Stampadocumenti.xml','wizard/fatturato.xml'],
+                    'report.xml','wizard/Stampadocumenti.xml','wizard/fatturato.xml', 'wizard/stampa_analisi.xml'],
                     
     'website': 'http://www.cgsoftware.it',
     'installable': True,

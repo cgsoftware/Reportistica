@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ordinato" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
 	<property name="ireport.zoom" value="1.5"/>
-	<property name="ireport.x" value="395"/>
+	<property name="ireport.x" value="663"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="adata" class="java.lang.String">
 		<parameterDescription><![CDATA[]]></parameterDescription>
@@ -206,6 +206,12 @@ ORDER BY
 		<variableExpression><![CDATA[$F{sale_order_line_product_uom_qty}*$F{sale_order_line_price_unit}]]></variableExpression>
 		<initialValueExpression><![CDATA[]]></initialValueExpression>
 	</variable>
+	<variable name="importo_da" class="java.math.BigDecimal" resetType="Group" resetGroup="ordinato" calculation="Sum">
+		<variableExpression><![CDATA[$F{tempstatistiche_ordinato_daevadere}*$F{sale_order_line_price_unit}]]></variableExpression>
+	</variable>
+	<variable name="tot_importo_da" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{tempstatistiche_ordinato_daevadere}*$F{sale_order_line_price_unit}]]></variableExpression>
+	</variable>
 	<group name="Partner">
 		<groupExpression><![CDATA[$F{sale_order_partner_id}]]></groupExpression>
 		<groupHeader>
@@ -278,86 +284,98 @@ ORDER BY
 					<text><![CDATA[Articolo]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="383" y="24" width="23" height="12"/>
+					<reportElement x="314" y="24" width="23" height="12"/>
 					<textElement textAlignment="Center">
 						<font size="10"/>
 					</textElement>
 					<text><![CDATA[U.M.]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="466" y="24" width="72" height="32"/>
+					<reportElement x="397" y="24" width="72" height="32"/>
 					<textElement textAlignment="Center">
 						<font size="10"/>
 					</textElement>
 					<text><![CDATA[Prezzo unitario]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="588" y="24" width="47" height="12"/>
+					<reportElement x="519" y="24" width="47" height="12"/>
 					<textElement textAlignment="Right">
 						<font size="10"/>
 					</textElement>
 					<text><![CDATA[Importo]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="545" y="24" width="35" height="12"/>
+					<reportElement x="476" y="24" width="35" height="12"/>
 					<textElement textAlignment="Center">
 						<font size="10"/>
 					</textElement>
 					<text><![CDATA[Sconto]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="430" y="24" width="23" height="12"/>
+					<reportElement x="361" y="24" width="23" height="12"/>
 					<textElement textAlignment="Center">
 						<font size="10"/>
 					</textElement>
 					<text><![CDATA[Q.tà]]></text>
 				</staticText>
 				<staticText>
-					<reportElement mode="Opaque" x="690" y="24" width="62" height="32" forecolor="#F80B0B" backcolor="#FEFEFE"/>
+					<reportElement mode="Opaque" x="621" y="24" width="62" height="32" forecolor="#F80B0B" backcolor="#FEFEFE"/>
 					<textElement textAlignment="Right">
 						<font size="10" isBold="true"/>
 					</textElement>
-					<text><![CDATA[Da Evadare]]></text>
+					<text><![CDATA[Da Evadere]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="640" y="24" width="50" height="12"/>
+					<reportElement x="571" y="24" width="50" height="12"/>
 					<textElement textAlignment="Right">
 						<font size="10"/>
 					</textElement>
 					<text><![CDATA[Evaso]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="635" y="24" width="22" height="12"/>
+					<reportElement x="566" y="24" width="22" height="12"/>
 					<textElement textAlignment="Center">
 						<font size="10"/>
 					</textElement>
 					<text><![CDATA[Ag.]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="683" y="24" width="71" height="32" forecolor="#050183" backcolor="#FEFEFE"/>
+					<textElement textAlignment="Right">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Importo da Evadere]]></text>
 				</staticText>
 			</band>
 		</groupHeader>
 		<groupFooter>
 			<band height="15">
 				<textField pattern="#,##0.000" isBlankWhenNull="true">
-					<reportElement x="406" y="0" width="60" height="15"/>
+					<reportElement x="337" y="0" width="60" height="15"/>
 					<textElement textAlignment="Right"/>
 					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{qta}]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement x="324" y="0" width="77" height="15"/>
+					<reportElement x="255" y="0" width="77" height="15"/>
 					<textElement textAlignment="Center">
 						<font size="10"/>
 					</textElement>
 					<text><![CDATA[Totali]]></text>
 				</staticText>
 				<textField pattern="#,##0.000" isBlankWhenNull="true">
-					<reportElement mode="Opaque" x="673" y="0" width="79" height="15" forecolor="#F80B0B" backcolor="#FEFEFE"/>
+					<reportElement mode="Opaque" x="604" y="0" width="79" height="15" forecolor="#F80B0B" backcolor="#FEFEFE"/>
 					<textElement textAlignment="Right"/>
 					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{jole}]]></textFieldExpression>
 				</textField>
 				<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
-					<reportElement x="552" y="0" width="83" height="15"/>
+					<reportElement x="483" y="0" width="83" height="15"/>
 					<textElement textAlignment="Right"/>
 					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{importo}]]></textFieldExpression>
+				</textField>
+				<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
+					<reportElement mode="Opaque" x="683" y="0" width="71" height="15" forecolor="#050183" backcolor="#FEFEFE"/>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{importo_da}]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupFooter>
@@ -411,28 +429,28 @@ ORDER BY
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{product_product_default_code}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="383" y="0" width="23" height="10"/>
+				<reportElement x="314" y="0" width="23" height="10"/>
 				<textElement textAlignment="Center">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{product_uom_name}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.000" isBlankWhenNull="true">
-				<reportElement x="485" y="0" width="37" height="10"/>
+				<reportElement x="416" y="0" width="37" height="10"/>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{sale_order_line_price_unit}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
-				<reportElement x="588" y="0" width="47" height="10"/>
+				<reportElement x="519" y="0" width="47" height="10"/>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{sale_order_line_product_uom_qty}*$F{sale_order_line_price_unit}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="545" y="0" width="34" height="10"/>
+				<reportElement x="476" y="0" width="34" height="10"/>
 				<textElement textAlignment="Center">
 					<font size="8"/>
 				</textElement>
@@ -446,32 +464,39 @@ ORDER BY
 				<textFieldExpression class="java.util.Date"><![CDATA[$F{sale_order_date_order}+$F{sale_order_line_delay}.intValue()]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.000" isBlankWhenNull="true">
-				<reportElement x="419" y="0" width="48" height="10"/>
+				<reportElement x="350" y="0" width="48" height="10"/>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{sale_order_line_product_uom_qty}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.000" isBlankWhenNull="true">
-				<reportElement x="640" y="0" width="50" height="10"/>
+				<reportElement x="571" y="0" width="50" height="10"/>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{tempstatistiche_ordinato_evasa}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.000" isBlankWhenNull="true">
-				<reportElement mode="Opaque" x="707" y="0" width="45" height="10" forecolor="#F80B0B" backcolor="#FEFEFE"/>
+				<reportElement mode="Opaque" x="638" y="0" width="45" height="10" forecolor="#F80B0B" backcolor="#FEFEFE"/>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{tempstatistiche_ordinato_daevadere}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement mode="Opaque" x="639" y="0" width="15" height="10"/>
+				<reportElement mode="Opaque" x="570" y="0" width="15" height="10"/>
 				<textElement textAlignment="Center">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{sale_agent_name}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="683" y="0" width="71" height="10" forecolor="#050183" backcolor="#FEFEFE"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{tempstatistiche_ordinato_daevadere}*$F{sale_order_line_price_unit}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
@@ -484,21 +509,21 @@ ORDER BY
 	<lastPageFooter>
 		<band height="16">
 			<textField pattern="#,##0.000" isBlankWhenNull="true">
-				<reportElement mode="Opaque" x="673" y="1" width="79" height="15" forecolor="#F80B0B" backcolor="#FEFEFE"/>
+				<reportElement mode="Opaque" x="604" y="1" width="79" height="15" forecolor="#F80B0B" backcolor="#FEFEFE"/>
 				<textElement textAlignment="Right">
 					<font isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{jole_1}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
-				<reportElement x="552" y="1" width="83" height="15"/>
+				<reportElement x="483" y="1" width="83" height="15"/>
 				<textElement textAlignment="Right">
 					<font isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{importo_1}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.000" isBlankWhenNull="true">
-				<reportElement x="406" y="1" width="60" height="15"/>
+				<reportElement x="337" y="1" width="60" height="15"/>
 				<textElement textAlignment="Right">
 					<font isBold="true"/>
 				</textElement>
@@ -511,6 +536,13 @@ ORDER BY
 				</textElement>
 				<text><![CDATA[Totali generali]]></text>
 			</staticText>
+			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="683" y="1" width="71" height="15" forecolor="#050183" backcolor="#FEFEFE"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{tot_importo_da}]]></textFieldExpression>
+			</textField>
 		</band>
 	</lastPageFooter>
 	<summary>

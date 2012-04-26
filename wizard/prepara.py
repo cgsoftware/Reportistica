@@ -43,7 +43,14 @@ class tempstatistiche_art(osv.osv):
           
         ok = self._pulisci(cr, uid, context)
         testa = self.pool.get('fiscaldoc.header')
-        filtro_data = [('data_documento','<=', parametri.adata),('data_documento','>=', parametri.dadata)]
+        partner_obj = self.pool.get('res.partner')
+        if parametri.agente:
+            filtro_ag =[('agent_id','=',parametri.agente.id)]
+            partner_ids = partner_obj.search(cr, uid, filtro_ag)
+            partner_ids = tuple(partner_ids)
+            filtro_data = [('data_documento','<=', parametri.adata),('data_documento','>=', parametri.dadata), ('partner_id', 'in', partner_ids)]
+        else:       
+            filtro_data = [('data_documento','<=', parametri.adata),('data_documento','>=', parametri.dadata)]
         # 2° filtro per causale controlla che la causale doc sia di VENDITA ('C')
         #filtro_caus = [('fiscaldoc_causalidoc.tipo_operazione' ,=, 'C')]
         testate_ids = testa.search(cr, uid, filtro_data)
@@ -65,24 +72,43 @@ class tempstatistiche_art(osv.osv):
                                 if id_temp:
                             # già esistente
                                     riga_temp = self.browse(cr,uid,id_temp)[0]
-                                    rigawr ={
-                                             'totqty':riga_temp.totqty+riga_doc.product_uom_qty,
-                                             'totvalore':riga_temp.totvalore+riga_doc.totale_riga
+                                    if rec_testa.tipo_doc.tipo_documento == 'NC':
+                                        rigawr ={
+                                                 'totqty':riga_temp.totqty-riga_doc.product_uom_qty,
+                                                 'totvalore':riga_temp.totvalore-riga_doc.totale_riga
                                              
-                                             }
-                                    ok = self.write(cr,uid,id_temp,rigawr)
+                                                 }
+                                        ok = self.write(cr,uid,id_temp,rigawr)
+                                    
+                                    
+                                    else:
+                                        rigawr ={
+                                                 'totqty':riga_temp.totqty+riga_doc.product_uom_qty,
+                                                 'totvalore':riga_temp.totvalore+riga_doc.totale_riga
+                                             
+                                                 }
+                                        ok = self.write(cr,uid,id_temp,rigawr)
                                 else:
                             #nuovo record
                             #pass
                                     categoria  = riga_doc.product_id.product_tmpl_id.categ_id 
                                     cat_name = self.mappa_categoria(cr, uid, categoria, context)
-                                    rigawr ={
+                                    if rec_testa.tipo_doc.tipo_documento == 'NC':
+                                        rigawr ={
+                                             'categoria':cat_name,
+                                             'product_id':riga_doc.product_id.id,
+                                             'totqty':riga_doc.product_uom_qty*-1,
+                                             'totvalore':riga_doc.totale_riga*-1
+                                                }
+                                        id_temp = self.create(cr,uid,rigawr)
+                                    else:
+                                        rigawr ={
                                              'categoria':cat_name,
                                              'product_id':riga_doc.product_id.id,
                                              'totqty':riga_doc.product_uom_qty,
                                              'totvalore':riga_doc.totale_riga
-                                             }
-                                    id_temp = self.create(cr,uid,rigawr)
+                                                }
+                                        id_temp = self.create(cr,uid,rigawr)
                             else:
                                 pass
                             
@@ -131,29 +157,103 @@ class tempstatistiche_art(osv.osv):
                                      if id_temp:
                                             # già esistente
                                             riga_temp = self.browse(cr,uid,id_temp)[0]
-                                            rigawr ={
-                                                  'totqty':riga_temp.totqty+riga_doc.product_uom_qty,
+                                            if rec_testa.tipo_doc.tipo_documento == 'NC':
+                                                rigawr ={
+                                                 'totqty':riga_temp.totqty-riga_doc.product_uom_qty,
+                                                  'totvalore':riga_temp.totvalore-riga_doc.totale_riga,
+                                                  'pesoconai':riga_temp.pesoconai-riga_doc.peso_conai
+                                             
+                                                 }
+                                                ok = self.write(cr,uid,id_temp,rigawr)
+                                    
+                                    
+                                            else:
+                                                rigawr ={
+                                                 'totqty':riga_temp.totqty+riga_doc.product_uom_qty,
                                                   'totvalore':riga_temp.totvalore+riga_doc.totale_riga,
                                                   'pesoconai':riga_temp.pesoconai+riga_doc.peso_conai
-                                             }
-                                            ok = self.write(cr,uid,id_temp,rigawr)
+                                             
+                                                 }
+                                                ok = self.write(cr,uid,id_temp,rigawr)
                                      else:
                                         #nuovo record
                                         #pass
                                         
                                         cat_name = riga_doc.product_id.product_tmpl_id.categ_id.name
-                                        rigawr ={
+                                        if rec_testa.tipo_doc.tipo_documento == 'NC':
+                                            rigawr ={
                                                  'categoria':cat_name,
                                                  'product_id':riga_doc.product_id.id,
-                                                 'totqty':riga_doc.product_uom_qty,
-                                                 'totvalore':riga_doc.totale_riga,
-                                                 'pesoconai':riga_doc.peso_conai
+                                                 'totqty':riga_doc.product_uom_qty*-1,
+                                                 'totvalore':riga_doc.totale_riga*-1,
+                                                 'pesoconai':riga_doc.peso_conai*-1
                                                  }
-                                        id_temp = self.create(cr,uid,rigawr)
+                                            id_temp = self.create(cr,uid,rigawr)
+                                        else:
+                                        
+                                                 rigawr ={
+                                                          'categoria':cat_name,
+                                                          'product_id':riga_doc.product_id.id,
+                                                          'totqty':riga_doc.product_uom_qty,
+                                                          'totvalore':riga_doc.totale_riga,
+                                                          'pesoconai':riga_doc.peso_conai
+                                                          }
+                                                 id_temp = self.create(cr,uid,rigawr)
                             else:
                                 pass
                             
         
+        
+        return
+    
+    def carica_categorie_prod(self,cr,uid,parametri,context):
+          
+        ok = self._pulisci(cr, uid, context)
+        mrp = self.pool.get('mrp.production')
+        filtro_data = [('date_start','<=', parametri.adata),('date_start','>=', parametri.dadata)]
+        mrp_ids = mrp.search(cr, uid, filtro_data)
+        #testate_ids = testa.search(cr, uid, filtro_data)
+        categ = parametri.categoria.child_id
+        # 
+        lista_id=[]
+        lista_id.append(parametri.categoria.id)
+        for riga in categ:
+            lista_id.append(riga.id)
+           
+            #import pdb;pdb.set_trace()
+            if riga.child_id:
+                sottocateg=riga.child_id
+                for new in sottocateg:
+                    lista_id.append(new.id)
+            
+                
+            
+        if mrp_ids:
+            for rec_mrp in mrp.browse(cr, uid, mrp_ids):
+                if rec_mrp.product_id.product_tmpl_id.categ_id.id in lista_id:
+                    cerca = [('product_id','=',rec_mrp.product_id.id)]
+                    #import pdb;pdb.set_trace() 
+                    if rec_mrp.state == "done":
+                        id_temp = self.search(cr,uid,cerca)
+                        if id_temp:
+                            riga_temp = self.browse(cr,uid,id_temp)[0]
+                    
+                            rigawr ={
+                                          'totqty':riga_temp.totqty+rec_mrp.product_qty,
+                                          'totvalore':riga_temp.totvalore+rec_mrp.total_production_cost
+                                          }
+                            ok = self.write(cr,uid,id_temp,rigawr)
+                        else:
+                            #nuovo record
+                            #pass
+                            cat_name  = rec_mrp.product_id.product_tmpl_id.categ_id.name
+                            #cat_name = self.mappa_categoria(cr, uid, categoria, context)
+                            rigawr ={'categoria':cat_name,
+                                     'product_id':rec_mrp.product_id.id,
+                                     'totqty':rec_mrp.product_qty,
+                                     'totvalore':rec_mrp.total_production_cost
+                                     }
+                            id_temp = self.create(cr,uid,rigawr)     
         
         return
 
@@ -213,6 +313,7 @@ class parcalcolo_fatturato(osv.osv_memory):
                 'atipodoc':fields.many2one('fiscaldoc.causalidoc', 'A tipo documento'),
                 'categoria':fields.many2one('product.category', 'Categoria') ,
                 'tipo_Stampa':fields.selection([('FATTURATO','Fatturato'),('PRODOTTO','Prodotto')],'Tipo Stampa', required=True),
+                'agente':fields.many2one('sale.agent', 'Agente'),
                }
     #_order = ''
     
@@ -274,13 +375,19 @@ class parcalcolo_fatturato(osv.osv_memory):
         parametri = self.browse(cr,uid,ids)[0]
         righe = self.pool.get('fiscaldoc.righe')
         testa = self.pool.get('fiscaldoc.header')
-        if parametri.categoria:
-            ok = self.pool.get('tempstatistiche.art').carica_categorie(cr,uid,parametri,context)
+        if parametri.tipo_Stampa == 'FATTURATO':
+                if parametri.categoria:
+                    ok = self.pool.get('tempstatistiche.art').carica_categorie(cr,uid,parametri,context)
+                else:
+                    ok = self.pool.get('tempstatistiche.art').carica_fatturato(cr,uid,parametri,context)
         else:
-            if parametri.tipo_Stampa == 'FATTURATO':
-                ok = self.pool.get('tempstatistiche.art').carica_fatturato(cr,uid,parametri,context)
+            if parametri.categoria:
+                ok = self.pool.get('tempstatistiche.art').carica_categorie_prod(cr,uid,parametri,context)
             else:
                 ok = self.pool.get('tempstatistiche.art').carica_prodotto(cr,uid,parametri,context)
+        
+        
+       
         return self._print_report(cr, uid, ids, data, parametri, context=context)
     
    

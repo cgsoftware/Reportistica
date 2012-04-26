@@ -18,6 +18,7 @@
                         <field name="tipodoc" colspan="4"/>
                         <field name="atipodoc" colspan="4"/>
                         <field name="categoria" colspan="4"/>
+                        <field name="agente" colspan="4"/>
                         <field name="tipo_Stampa"  width="300" colspan="4"/>
                         
                     </group>

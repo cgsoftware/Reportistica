@@ -1,3 +1,6 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_tempstatistiche_art,tempstatistiche.art,model_tempstatistiche_art,,1,1,1,1
-access_tempstatistiche_ordinato,tempstatistiche.ordinato,model_tempstatistiche_ordinato,,1,1,1,1
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_tempstatistiche_art","tempstatistiche.art","model_tempstatistiche_art",,1,1,1,1
+"access_tempstatistiche_ordinato","tempstatistiche.ordinato","model_tempstatistiche_ordinato",,1,1,1,1
+"access_fiscaldoc_fatturato","fiscaldoc.fatturato","model_fiscaldoc_fatturato",,1,1,1,1
+"access_tempstatistiche_trasporti","tempstatistiche.trasporti","model_tempstatistiche_trasporti",,1,1,1,1
+"access_tempstatistiche_brogliacci","tempstatistiche.brogliacci","model_tempstatistiche_brogliacci",,1,1,1,1
