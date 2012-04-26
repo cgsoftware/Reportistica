@@ -24,12 +24,18 @@ class tempstatistiche_ordinato(osv.osv):
                 }
     def mappa_categoria(self, cr, uid, categoria, context):
         lista_id=[]
-        
+       
         for categ in categoria.categoria_ids: 
             lista_id.append(categ.categoria.id)
+            #import pdb;pdb.set_trace()
             if categ.categoria.child_id:
                 for child in categ.categoria.child_id:
                     lista_id.append(child.id)
+                    if child.child_id:
+                        for figlio in child.child_id:
+                            lista_id.append(figlio.id)
+                    
+                    
         
         return lista_id
      
@@ -47,27 +53,44 @@ class tempstatistiche_ordinato(osv.osv):
                 #HO UNA CATEGORIA DA INCLUDERE
                 lista_id = self.mappa_categoria(cr, uid, parametri, context)
             for ordine in sale.browse(cr, uid, ord_ids):
+              #import pdb;pdb.set_trace()
+              if not ordine.chiuso:
                 #cerca = [('id','=',ordine.id)]
                 #id_temp = self.search(cr,uid,cerca)
-              if ordine.order_line:
+               if ordine.order_line:
                 for riga_doc in ordine.order_line:
                     #adesso leggo le righe dell'ordine selezionato
 		 if riga_doc.product_id:
 
                     if riga_doc.product_id.product_tmpl_id.categ_id.id in lista_id:                        
                         if riga_doc.move_ids:
-                         #import pdb;pdb.set_trace()
+                         
+                         
                          for stock in riga_doc.move_ids:
-                          if parametri.evase==1 or parametri.evase == True : 
+                                                 
+                                           
+                           if parametri.evase==1 or parametri.evase == True : 
                               #DEVE STAMPARE ANCHE LE RIGHE GIA' EVASE      
                               if stock.state == 'done':
                                   evasa=stock.product_qty,
                                   if stock.product_qty <= riga_doc.product_uom_qty:
-                                      rigawr={'riga':riga_doc.id,
+                                      cerca=[('riga','=',stock.sale_line_id.id)]
+                                      id_temp = self.search(cr,uid,cerca)
+                                      if id_temp:
+                                       #import pdb;pdb.set_trace()
+                                       riga_temp=self.browse(cr,uid, id_temp[0])
+                                       rigawr={'evasa':riga_temp.evasa+stock.product_qty,
+                                           'daevadere':riga_temp.daevadere-stock.product_qty
+                                              }
+                                       ok = self.write(cr,uid,id_temp,rigawr)
+                                       
+                                      else:
+                                       rigawr={'riga':riga_doc.id,
                                               'evasa':evasa[0],
                                               'daevadere':riga_doc.product_uom_qty-evasa[0]
                                               }
-                                      ok = self.create(cr,uid,rigawr)
+                                      
+                                       ok = self.create(cr,uid,rigawr)
                                   else:
                                       rigawr={'riga':riga_doc.id,
                                               'evasa':stock.product_qty,
@@ -81,12 +104,29 @@ class tempstatistiche_ordinato(osv.osv):
                                           'daevadere':riga_doc.product_uom_qty
                                           }
                                   ok = self.create(cr,uid,rigawr)
-                          else:
+                           else:
                               #SOLO RIGHE DA EVADERE
-                              #import pdb;pdb.set_trace()
+                              #
                               if stock.state == 'done':
-                                  evasa=stock.product_qty,
-                                  if stock.product_qty <= riga_doc.product_uom_qty:
+                                  
+                                  
+                                  
+                                   evasa=stock.product_qty,
+                                   if stock.product_qty <= riga_doc.product_uom_qty:
+                                    cerca=[('riga','=',stock.sale_line_id.id)]
+                                    id_temp = self.search(cr,uid,cerca)
+                                    if id_temp:
+                                       #import pdb;pdb.set_trace()
+                                       riga_temp=self.browse(cr,uid, id_temp[0])
+                                       rigawr={'evasa':riga_temp.evasa+stock.product_qty,
+                                           'daevadere':riga_temp.daevadere-stock.product_qty
+                                              }
+                                       if riga_temp.daevadere-stock.product_qty>0:
+                                          ok = self.write(cr,uid,id_temp,rigawr)
+                                       else:
+                                
+                                          rigawr={}
+                                    else:
                                       rigawr={'riga':riga_doc.id,
                                               'evasa':evasa[0],
                                               'daevadere':riga_doc.product_uom_qty-evasa[0]
@@ -96,11 +136,12 @@ class tempstatistiche_ordinato(osv.osv):
                                       else:
                                           rigawr={}
                               else:
-                                  rigawr={'riga':riga_doc.id,
+                                  
+                                   rigawr={'riga':riga_doc.id,
                                           'evasa':0,
                                           'daevadere':riga_doc.product_uom_qty,
                                               }
-                                  ok = self.create(cr,uid,rigawr)
+                                   ok = self.create(cr,uid,rigawr)
                               
                                  
                                       
@@ -241,6 +282,17 @@ class parcalcolo_categorie_order(osv.osv_memory):
                 }
 parcalcolo_categorie_order()
 
-               
+class sale_order(osv.osv):
+    _inherit = 'sale.order' 
+    _columns = {'chiuso':fields.boolean('Considera Evaso', required=False),
+                }
+sale_order()
+
+class stock_move(osv.osv):
+    _inherit = 'stock.move'
+    _columns = {
+                'sale_line_id': fields.many2one('sale.order.line', 'Sales Order Line', ondelete='set null', select=True, readonly=False),
+    }
+stock_move()
 
 

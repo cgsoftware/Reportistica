@@ -49,6 +49,43 @@
 		          name='Stampa degli ordini in corso'
 	              id="menu_stampa_ordinato" 
 		          parent="menu_stampe_vendite"  sequence="2"/>
+		          
+
+    	<record model="ir.ui.view" id="view_order_form_flag_evasione">
+                <field name="name">Sale Order Evasione</field>
+                <field name="model">sale.order</field>
+                <field name="type">form</field>
+                <field name="inherit_id" ref="sale.view_order_form"/>
+                <field name="arch" type="xml">
+                <field name="invoice_quantity" position='after'>
+                			<newline/>
+                        	<field name="chiuso" />
+                     </field>                     	
+                        	
+                    	</field>
+
+               
+        </record>
+        <!-- <record model="ir.ui.view" id="view_qty_evasa">
+                <field name="name">saleorderline.qty_evasa_manuale</field>
+                <field name="model">sale.order</field>
+                <field name="type">form</field>
+                <field name="inherit_id" ref="sale.view_order_form"/>
+                <field name="arch" type="xml">
+                	
+                
+                
+                 <field name="address_allotment_id" position='after'>
+                			<newline/>
+                        	<field name="qty_evasa" />
+                        	
+                                     	
+                   </field>     	
+                </field>
+
+               
+        </record> -->
+
             
             
         
