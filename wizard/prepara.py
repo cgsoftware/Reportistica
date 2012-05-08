@@ -322,7 +322,8 @@ class parcalcolo_fatturato(osv.osv_memory):
         if context is None:
             context = {}
         result = {}
-       
+        val = ' '
+        val2= ' '
         #if data['form']['tipodoc']==0 or data['form']['tipodoc']==False:
         #     data['form']['tipodoc']=1
         #     data['form']['atipodoc']=99999
@@ -333,9 +334,13 @@ class parcalcolo_fatturato(osv.osv_memory):
         
         parametri.adata = time.strptime(parametri.adata, "%Y-%m-%d")
         parametri.adata=time.strftime("%d/%m/%Y",parametri.adata)
-        
+        if parametri.categoria:
+            val = parametri.categoria.name
+        if parametri.agente:
+            val2 = parametri.agente.name
         result = {'dadata':parametri.dadata,'adata':parametri.adata, 
-                  'tipo_Stampa':parametri.tipo_Stampa
+                  'tipo_Stampa':parametri.tipo_Stampa, 'categoria':val, 'agente':val2
+
                   #'tipodoc':data['form']['tipodoc'],'atipodoc':data['form']['atipodoc'],
                   
                     }

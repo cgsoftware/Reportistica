@@ -18,7 +18,8 @@
                         <field name="agente" width="300" colspan="4"/>
                         <field name="group1"/>
                         <field name="group2"/>
-                        <field name="stampa"/>	
+                        <field name="stampa"/>
+                        <field name="export_csv"/>	
                         <separator colspan="4"/>
                         <group col="4" colspan="4">
                             <button icon="gtk-cancel" special="cancel" string="Cancel" colspan="2"/>
@@ -44,6 +45,36 @@
 		          name='Stampa brogliaccio documenti di vendita'
 	              id="menu_stampa_brocliaccio" 
 		          parent="menu_stampe_vendite"  sequence="1"/>
+		          
+		
+		<record id="wizard_gencsvbrogl" model="ir.ui.view">
+            <field name="name">Genera File Csv Brogliaccio Documenti</field>
+            <field name="model">crea_csv_brogliacci</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Genera Csv Inventario">
+                    <group col="4">
+                        <group colspan="4" >
+                            <newline />
+                            <button icon="gtk-cancel" special="cancel" string="Cancel"/>
+                            <button icon="gtk-ok" name="generacsvbrog" string="Export" type="object"/>
+                        </group>
+                        <group colspan="4">
+                            <field name="data" readonly="1"/>
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>			
+        
+       <act_window name="Genera File Csv Brogliaccio Documenti"
+            res_model="crea_csv_brogliacci"
+            src_model="crea_csv_brogliacci"
+            view_mode="form"
+            target="new"
+            key2="client_action_multi"
+            id="action_wizard_gencsvbrogl"
+            view_id="wizard_gencsvbrogl"/>
             
             
         

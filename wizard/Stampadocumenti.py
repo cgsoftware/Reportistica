@@ -7,6 +7,7 @@ import time
 from tools.translate import _
 from osv import osv, fields
 from tools.translate import _
+import base64
 
 class tempstatistiche_brogliacci(osv.osv):
     def _pulisci(self,cr,uid,context):
@@ -102,6 +103,7 @@ class fiscaldoc_brogliacci(osv.osv_memory):
                 'group1':fields.boolean('Raggruppo per cliente?'),
                 'group2':fields.boolean('Raggruppo per documento?'),
                 'stampa':fields.boolean('Stampa dettagliata?'),
+                'export_csv':fields.boolean('Genera CSV'),
                 'agente':fields.many2one('sale.agent', 'Agente', select=True),
                 #'prezzi':fields.boolean('Stampo i prezzi e gli sconti sull''ordine?'),
                 #'tipo': fields.selection(  (('O', 'Ordine Cliente'), ('P', 'Preventivo a Cliente')), 'Tipo di docuemento')
@@ -221,8 +223,21 @@ class fiscaldoc_brogliacci(osv.osv_memory):
         data['form']['parameters'] = used_context
         parametri = self.browse(cr,uid,ids)[0]
         ok = self.pool.get('tempstatistiche.brogliacci').carica_doc(cr,uid,parametri,context)
-        
-        return self._print_report(cr, uid, ids, data, context=context)
+        if parametri.export_csv:
+            return  {
+                             'name': 'Export Brogliacci',
+                             'view_type': 'form',
+                             'view_mode': 'form',
+                             'res_model': 'crea_csv_brogliacci',
+                             'type': 'ir.actions.act_window',
+                             'target': 'new',
+                             'context': context                            
+                             
+                             }
+        else:
+            return self._print_report(cr, uid, ids, data, context=context)
+    
+        return
     
     def view_init(self, cr, uid, fields_list, context=None):
         # import pdb;pdb.set_trace()
@@ -254,7 +269,75 @@ class fiscaldoc_brogliacci(osv.osv_memory):
   
 fiscaldoc_brogliacci()
 
+class crea_csv_brogliacci(osv.osv_memory):
+    _name = "crea_csv_brogliacci"
+    _description = "Crea il csv dal temp. Inventario"
+    _columns = {
+                    'state': fields.selection((('choose', 'choose'), # choose accounts
+                                               ('get', 'get'), # get the file
+                                   )),
+                    #'nomefile':fields.char('Nome del file',size=20,required = True)
+                    'data': fields.binary('File', readonly=True),
 
+                    }   
+                 
+    _defaults = {
+                 'state': lambda * a: 'choose',
+                 }
+    def generacsvbrog(self, cr, uid, ids,context=None): 
+        testa_obj = self.pool.get('fiscaldoc.header')
+        data= 0
+        if ids:
+            #import pdb;pdb.set_trace()
+            idts = self.pool.get('tempstatistiche.brogliacci').search(cr,uid,[], order='documento', context=context)
+            if idts:
+                File = """"""""
+                Record =""
+                Record += '"'+"Tipo"+'";'
+                Record += '"'+"Data Documento"+'";'
+                Record += '"'+"Documento"+'";'
+                Record += '"'+"Cliente"+'";'
+                Record += '"'+"Agente"+'";'
+                Record += '"'+"Pagamento"+'";'
+                Record += '"'+"Imponibile"+'";'
+                Record += '"'+"Imposta"+'";'
+                Record += '"'+"Conai"+'";' 
+                Record += '"'+"Totale"+'";'
+                Record += "\r\n"
+                for riga in self.pool.get('tempstatistiche.brogliacci').browse(cr,uid,idts,context):
+                    #Record =""
+                    doc = testa_obj.search(cr, uid, [('id','=', riga.documento)])
+                    #import pdb;pdb.set_trace()
+                    if doc:
+                        Record += '"'+ testa_obj.browse(cr, uid, doc[0]).tipo_doc.name+'";'
+                        data = testa_obj.browse(cr, uid, doc[0]).data_documento
+                        data = time.strptime(data, "%Y-%m-%d")
+                        data = time.strftime("%d/%m/%Y",data)
+                        Record += '"'+ data +'";'
+                        Record += '"'+ testa_obj.browse(cr, uid, doc[0]).name+'";'
+                        Record += '"'+ testa_obj.browse(cr, uid, doc[0]).partner_id.name +'";'
+                        Record += '"'+ testa_obj.browse(cr, uid, doc[0]).partner_id.agent_id.name+'";'
+                        Record += '"'+ testa_obj.browse(cr, uid, doc[0]).pagamento_id.name+'";'
+                    else:
+                        Record += '"'+'";'
+                        Record += '"'+'";'
+                        Record += '"'+'";'
+                        Record += '"'+'";'
+                        Record += '"'+'";'
+                        Record += '"'+'";'
+                    Record += '"'+ str(riga.imponibile)+'";'
+                    Record += '"'+ str(riga.imposta)+'";'
+                    Record += '"'+ str(riga.conai)+'";'
+                    Record += '"'+ str(riga.totale)+'";'
+                    Record += "\r\n"
+                #import pdb;pdb.set_trace()
+                File += Record
+                out = base64.encodestring(File)
+                return self.write(cr, uid, ids, {'state':'get', 'data':out}, context=context)
+        else:
+            return {'type': 'ir.actions.act_window_close'}
+                
+crea_csv_brogliacci()
                
 
 

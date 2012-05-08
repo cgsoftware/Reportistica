@@ -7,6 +7,7 @@ import time
 from tools.translate import _
 from osv import osv, fields
 from tools.translate import _
+import base64
 
 class tempstatistiche_ordinato(osv.osv):
     
@@ -19,9 +20,29 @@ class tempstatistiche_ordinato(osv.osv):
     _description = 'Temporaneo ordini in evasione'
     _columns = {'riga':fields.many2one('sale.order.line', 'Ordine', required=True),
                 'evasa':fields.float('Q.tà Evasa', digits=(12,3)),
-                'daevadere':fields.float('Q.tà da Evadere', digits=(12,3))
-                
+                'daevadere':fields.float('Q.tà da Evadere', digits=(12,3)),
+                'categoria':fields.char('categoria',size=64)
                 }
+    
+    
+    def nome_categoria(self, cr,uid,categoria,context):
+       #import pdb;pdb.set_trace()  
+       nome_cat =''
+       continua = True
+       if categoria:
+        while continua:
+           if categoria.parent_id:
+               categoria = categoria.parent_id
+           else:
+                nome_cat = categoria.name
+                continua=False
+        
+       return nome_cat
+    
+    
+    
+    
+    
     def mappa_categoria(self, cr, uid, categoria, context):
         lista_id=[]
        
@@ -85,23 +106,32 @@ class tempstatistiche_ordinato(osv.osv):
                                        ok = self.write(cr,uid,id_temp,rigawr)
                                        
                                       else:
+                                       categoria  = riga_doc.product_id.product_tmpl_id.categ_id 
+                                       cat_name = self.nome_categoria(cr, uid, categoria, context)   
                                        rigawr={'riga':riga_doc.id,
                                               'evasa':evasa[0],
-                                              'daevadere':riga_doc.product_uom_qty-evasa[0]
+                                              'daevadere':riga_doc.product_uom_qty-evasa[0],
+                                              'categoria': cat_name
                                               }
                                       
                                        ok = self.create(cr,uid,rigawr)
                                   else:
+                                      categoria  = riga_doc.product_id.product_tmpl_id.categ_id 
+                                      cat_name = self.nome_categoria(cr, uid, categoria, context)
                                       rigawr={'riga':riga_doc.id,
                                               'evasa':stock.product_qty,
-                                              'daevadere':0
+                                              'daevadere':0,
+                                              'categoria': cat_name
                                               }
                                       ok = self.create(cr,uid,rigawr)
                               else:
                                   evasa0=0
+                                  categoria  = riga_doc.product_id.product_tmpl_id.categ_id 
+                                  cat_name = self.nome_categoria(cr, uid, categoria, context)
                                   rigawr={'riga':riga_doc.id,
                                           'evasa':evasa0,
-                                          'daevadere':riga_doc.product_uom_qty
+                                          'daevadere':riga_doc.product_uom_qty,
+                                          'categoria': cat_name
                                           }
                                   ok = self.create(cr,uid,rigawr)
                            else:
@@ -127,19 +157,24 @@ class tempstatistiche_ordinato(osv.osv):
                                 
                                           rigawr={}
                                     else:
+                                      categoria  = riga_doc.product_id.product_tmpl_id.categ_id 
+                                      cat_name = self.nome_categoria(cr, uid, categoria, context)  
                                       rigawr={'riga':riga_doc.id,
                                               'evasa':evasa[0],
-                                              'daevadere':riga_doc.product_uom_qty-evasa[0]
+                                              'daevadere':riga_doc.product_uom_qty-evasa[0],
+                                              'categoria': cat_name
                                               }
                                       if riga_doc.product_uom_qty-evasa[0]>0:
                                           ok = self.create(cr,uid,rigawr)
                                       else:
                                           rigawr={}
                               else:
-                                  
+                                   categoria  = riga_doc.product_id.product_tmpl_id.categ_id 
+                                   cat_name = self.nome_categoria(cr, uid, categoria, context)
                                    rigawr={'riga':riga_doc.id,
                                           'evasa':0,
                                           'daevadere':riga_doc.product_uom_qty,
+                                          'categoria': cat_name
                                               }
                                    ok = self.create(cr,uid,rigawr)
                               
@@ -163,6 +198,7 @@ class stampa_ordinato(osv.osv_memory):
                 'categoria_ids':fields.one2many('parcalcolo.categorie.order', 'name', 'Categorie da Includere', required=True),
                 'evase': fields.boolean('Stampo anche le righe evase?',required=True),
                 'stampa':fields.selection([('html','HTML'),('csv','CSV'),('rtf','RTF'),('odt','ODT'),('ods','ODS'),('txt','Text'),('pdf','PDF')], 'File di Stampa'),
+                'export_csv':fields.boolean('Genera CSV')
                 #'dacliente':fields.many2one('res.partner', 'Da cliente', select=True),
                 #'acliente':fields.many2one('res.partner', 'A cliente', select=True),
                 #'danrv': fields.char('Da Documento',size=30,required=True),
@@ -176,15 +212,27 @@ class stampa_ordinato(osv.osv_memory):
                 #'prezzi':fields.boolean('Stampo i prezzi e gli sconti sull''ordine?'),
                 #'tipo': fields.selection(  (('O', 'Ordine Cliente'), ('P', 'Preventivo a Cliente')), 'Tipo di docuemento')
                 }
-    _defaults = {
-		 'stampa':'pdf',
-		}
+    _defaults = { 'stampa':lambda * a: 'PDF',}
     
     def _build_contexts(self, cr, uid, ids, data, context=None):
-	if context is None:
+        #import pdb;pdb.set_trace()
+        if context is None:
             context = {}
         result = {}
-        result = {'dadata':data['form']['dadata'],'adata':data['form']['adata'] }
+            
+        result = {}
+        parametri = self.browse(cr,uid,ids)[0]
+        data1 = time.strptime(parametri.dadata, "%Y-%m-%d")
+        data1 =time.strftime("%d/%m/%Y",data1)
+        
+        data2 = time.strptime(parametri.adata, "%Y-%m-%d")
+        data2 =time.strftime("%d/%m/%Y",data2)
+        nome_cat =''
+        #import pdb;pdb.set_trace()
+        for categ in parametri.categoria_ids:
+            nome_cat += categ.categoria.name
+            nome_cat += '-'
+        result = {'dadata':data1,'adata':data2, 'categoria':nome_cat, 'evase':parametri.evase }
 	return result
       
 
@@ -195,9 +243,9 @@ class stampa_ordinato(osv.osv_memory):
         data = {}
         data['ids'] = context.get('active_ids', [])
         data['model'] = context.get('active_model', 'ir.ui.menu')
-        data['form'] = self.read(cr, uid, ids, ['dadata',  'adata','carrier'])[0] #  'tipodoc', 'atipodoc' 
-        #used_context = self._build_contexts(cr, uid, ids, data, parametri, context=context)
-        #data['form']['parameters'] = used_context
+        data['form'] = self.read(cr, uid, ids, ['dadata',  'adata','categoria_ids', 'evase'])[0] #  'tipodoc', 'atipodoc' 
+        used_context = self._build_contexts(cr, uid, ids, data, context=context)
+        data['form']['parameters'] = used_context
         pool = pooler.get_pool(cr.dbname)
         active_ids = context and context.get('active_ids', [])
         #
@@ -235,7 +283,21 @@ class stampa_ordinato(osv.osv_memory):
         data['form'] = self.read(cr, uid, ids, ['dadata',  'adata'])[0]
         used_context = self._build_contexts(cr, uid, ids, data, context=context)
         data['form']['parameters'] = used_context
-        return self._print_report(cr, uid, ids, data, context=context)
+        parametri = self.browse(cr,uid,ids)[0]
+        if parametri.export_csv:
+            return  {
+                             'name': 'Export Ordinato',
+                             'view_type': 'form',
+                             'view_mode': 'form',
+                             'res_model': 'crea_csv_ordinato',
+                             'type': 'ir.actions.act_window',
+                             'target': 'new',
+                             'context': context                            
+                             
+                             }
+        else:
+            return self._print_report(cr, uid, ids, data, parametri, context=None)
+        return 
     
     def view_init(self, cr, uid, fields_list, context=None):
         # import pdb;pdb.set_trace()
@@ -270,7 +332,7 @@ class stampa_ordinato(osv.osv_memory):
         ok = self.pool.get('tempstatistiche.ordinato').carica_doc(cr,uid,parametri,context)
         
         #import pdb;pdb.set_trace()
-        return self._print_report(cr, uid, ids, data, parametri, context=context)
+        return self.check_report(cr, uid, ids, context=None)
   
 stampa_ordinato()
 
@@ -293,6 +355,80 @@ class stock_move(osv.osv):
     _columns = {
                 'sale_line_id': fields.many2one('sale.order.line', 'Sales Order Line', ondelete='set null', select=True, readonly=False),
     }
+    
+    
+class crea_csv_ordinato(osv.osv_memory):
+    _name = "crea_csv_ordinato"
+    _description = "Crea il csv dal temp. ordinato"
+    _columns = {
+                    'state': fields.selection((('choose', 'choose'), # choose accounts
+                                               ('get', 'get'), # get the file
+                                   )),
+                    #'nomefile':fields.char('Nome del file',size=20,required = True)
+                    'data': fields.binary('File', readonly=True),
+
+                    }   
+                 
+    _defaults = {
+                 'state': lambda * a: 'choose',
+                 }
+    
+    def generacsvordinato(self, cr, uid, ids,context=None):
+        order_obj = self.pool.get('sale.order')
+        if ids:            
+            idts = self.pool.get('tempstatistiche.ordinato').search(cr,uid,[])
+            if idts:
+                #import pdb;pdb.set_trace()
+                File = """"""""
+                Record =""
+                Record += '"'+"Ordine"+'";'
+                Record += '"'+"Data Ordine"+'";'
+                Record += '"'+"Cliente"+'";'
+                Record += '"'+"Agente"+'";'
+                Record += '"'+"Articolo"+'";'
+                Record += '"'+"Categoria"+'";'
+                Record += '"'+"U.M."+'";'
+                Record += '"'+"Q.ta' Ordinata"+'";'
+                Record += '"'+"Peso Conai"+'";'
+                Record += '"'+"Q.ta' in Kg"+'";'
+                Record += '"'+"Prezzo unitario"+'";'
+                Record += '"'+"Importo"+'";'
+                Record += '"'+"Q.ta' Evasa"+'";'
+                Record += '"'+"Q.ta' Da Evadere"+'";'
+                Record += '"'+"Importo da Evadere"+'";'
+                Record += '"'+"Giorni di consegna"+'";'
+                Record += "\r\n"
+                for riga in self.pool.get('tempstatistiche.ordinato').browse(cr,uid,idts, context):
+                    #import pdb;pdb.set_trace()
+                    Record += '"'+ riga.riga.order_id.name+'";'
+                    data = riga.riga.order_id.date_order
+                    data = time.strptime(data, "%Y-%m-%d")
+                    data = time.strftime("%d/%m/%Y",data)
+                    Record += '"'+ data +'";'
+                    Record += '"'+ riga.riga.order_id.partner_id.name +'";'
+                    Record += '"'+ riga.riga.order_id.partner_id.agent_id.name +'";'
+                    Record += '"'+ riga.riga.product_id.name +'";'
+                    Record += '"'+ riga.categoria +'";'
+                    Record += '"'+ riga.riga.product_uom.name+'";'
+                    Record += '"'+ str(riga.riga.product_uom_qty)+'";'
+                    Record += '"'+ str(riga.riga.product_id.peso_prod)+'";'
+                    Record += '"'+ str(riga.riga.product_uom_qty*riga.riga.product_id.peso_prod)+'";'
+                    Record += '"'+ str(riga.riga.price_unit)+'";'
+                    Record += '"'+ str(riga.riga.price_subtotal)+'";'
+                    Record += '"'+ str(riga.evasa)+'";'
+                    Record += '"'+ str(riga.daevadere)+'";'
+                    Record += '"'+ str(riga.daevadere*riga.riga.price_unit)+'";'
+                    Record += '"'+ str(riga.riga.delay)+'";'
+                    Record += "\r\n"
+                import pdb;pdb.set_trace()
+                File += Record
+                out = base64.encodestring(File)   
+                           
+                return self.write(cr, uid, ids, {'state':'get', 'data':out}, context=context)
+            else:
+                return {'type': 'ir.actions.act_window_close'}
+    
+crea_csv_ordinato()
 stock_move()
 
 

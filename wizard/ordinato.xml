@@ -13,6 +13,7 @@
                         <field name="adata" colspan="4"/>
                         <field name="evase" colspan="2"/>
                         <field name="stampa" width="300" colspan="2"/>
+                        <field name="export_csv"/>
                         <newline/>
                         <group colspan="4">
                             
@@ -86,7 +87,34 @@
                
         </record> -->
 
-            
+        <record id="wizard_gencsvord" model="ir.ui.view">
+            <field name="name">Genera File Csv Ordini da Evadere</field>
+            <field name="model">crea_csv_ordinato</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Genera Csv Ordini da Evadere">
+                    <group col="4">
+                        <group colspan="4" >
+                            <newline />
+                            <button icon="gtk-cancel" special="cancel" string="Cancel"/>
+                            <button icon="gtk-ok" name="generacsvordinato" string="Export" type="object"/>
+                        </group>
+                        <group colspan="4">
+                            <field name="data" readonly="1"/>
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>			
+        
+       <act_window name="Genera File Csv Ordini da Evadere"
+            res_model="crea_csv_ordinato"
+            src_model="crea_csv_ordinato"
+            view_mode="form"
+            target="new"
+            key2="client_action_multi"
+            id="action_wizard_gencsvord"
+            view_id="wizard_gencsvord"/>    
             
         
         
